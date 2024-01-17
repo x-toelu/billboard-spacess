@@ -3,4 +3,17 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import CustomUser
 
-admin.site.register(CustomUser, UserAdmin)
+
+class CustomUserAdmin(UserAdmin):
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "username", "password1", "password2"),
+            },
+        ),
+    )
+
+
+admin.site.register(CustomUser, CustomUserAdmin)
