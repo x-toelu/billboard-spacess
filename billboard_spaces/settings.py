@@ -46,6 +46,10 @@ INSTALLED_APPS = [
 
     # local apps
     "apps.accounts",
+    
+    # third party apps
+    "rest_framework",
+    "rest_framework_simplejwt",
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
