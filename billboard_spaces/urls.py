@@ -29,7 +29,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('', index_view, name='index-view'),
     path('users/', include('apps.accounts.urls')),
-    path('docs', docs_schema_view.with_ui('swagger', cache_timeout=0)),
+    path('docs/', docs_schema_view.with_ui('swagger', cache_timeout=0)),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
