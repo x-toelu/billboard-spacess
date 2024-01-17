@@ -48,14 +48,19 @@ INSTALLED_APPS = [
     "apps.accounts",
 
     # third party apps
+    'drf_yasg',
     "rest_framework",
     "rest_framework_simplejwt",
 ]
+if DEBUG:
+    INSTALLED_APPS.insert(5, 'whitenoise.runserver_nostatic')
+
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -132,11 +137,22 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'}}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+# DRF-YASG Settings
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {'wallet_signature': {'type': 'apiKey', 'in': 'header', 'name': 'Authorization'}},
+}
 
 # REST Framework settings
 
