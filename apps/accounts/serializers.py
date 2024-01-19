@@ -54,3 +54,8 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'state_of_residence',
             'display_name'
         ]
+
+
+class InputSerializer(serializers.Serializer):
+    code = serializers.CharField(required=False)
+    error = serializers.CharField(required=False)

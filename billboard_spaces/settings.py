@@ -179,6 +179,12 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.views.custom_exception_handler',
 }
 
+#  Google auth settings
+
+BASE_FRONTEND_URL = environ('DJANGO_BASE_FRONTEND_URL')
+GOOGLE_OAUTH2_CLIENT_ID = environ('GOOGLE_OAUTH2_CLIENT_ID')
+GOOGLE_OAUTH2_CLIENT_SECRET = environ('GOOGLE_OAUTH2_CLIENT_SECRET')
+
 
 # Logging settings
 
