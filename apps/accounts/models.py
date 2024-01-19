@@ -40,7 +40,7 @@ class CustomUser(AbstractUser):
         ('nasarawa', 'Nasarawa'), ('niger', 'Niger'), ('ogun', 'Ogun'),
         ('ondo', 'Ondo'), ('osun', 'Osun'), ('oyo', 'Oyo'), ('plateau', 'Plateau'),
         ('rivers', 'Rivers'), ('sokoto', 'Sokoto'), ('taraba', 'Taraba'),
-        ('yobe', 'Yobe'), ('zamfara', 'Zamfara'), ('federal_capital_territory', 'FCT')
+        ('yobe', 'Yobe'), ('zamfara', 'Zamfara'), ('fct_abuja', 'FCT (Abuja)')
     ]
 
     id = models.UUIDField(
