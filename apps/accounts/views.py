@@ -13,13 +13,16 @@ class UserCreationView(CreateAPIView):
 
 
 class UpdateProfileView(UpdateAPIView):
+    """
+    Updates part of user profile with PUT request.
+    """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    allowed_methods = ['PATCH']
+    allowed_methods = ['PUT']
 
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         error_data = {
-            "errors": ["Method 'PUT' not allowed."],
+            "errors": ["Method 'PATCH' not allowed."],
             "message": "MethodNotAllowed",
         }
         return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
