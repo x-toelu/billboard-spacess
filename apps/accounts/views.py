@@ -32,6 +32,9 @@ class UpdateProfileView(UpdateAPIView):
         }
         return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
 
 def generate_tokens_for_user(user):
     """
@@ -78,7 +81,8 @@ class GoogleLoginApi(GenericAPIView):
             }
             return Response(response_data)
         except get_user_model().DoesNotExist:
-            full_name = user_data.get('given_name', '') + user_data.get('family_name', '')
+            full_name = user_data.get(
+                'given_name', '') + user_data.get('family_name', '')
 
             user = get_user_model().objects.create(
                 email=user_data['email'],
