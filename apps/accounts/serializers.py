@@ -30,3 +30,27 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         return get_user_model().objects.create_user(**validated_data)
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(required=True)
+    phone_number = serializers.CharField(required=True)
+    display_name = serializers.CharField(required=True)
+    user_field = serializers.ChoiceField(
+        required=True,
+        choices=get_user_model().USER_CHOICES
+    )
+    state_of_residence = serializers.ChoiceField(
+        required=True,
+        choices=get_user_model().NIGERIAN_STATES
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = [
+            'user_field',
+            'full_name',
+            'phone_number',
+            'state_of_residence',
+            'display_name'
+        ]
