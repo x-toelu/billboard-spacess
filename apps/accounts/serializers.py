@@ -59,3 +59,24 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'state_of_residence',
             'display_name'
         ]
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """
+    Serializer to request for a password change
+    """
+    email = serializers.EmailField()
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    """
+    Serializer for reseting user's password
+    """
+    uid = serializers.CharField(required=True)
+    token = serializers.CharField(required=True)
+    password = serializers.CharField(
+        min_length=8,
+        write_only=True,
+        validators=[validate_password]
+    )
+    password2 = serializers.CharField(write_only=True)
