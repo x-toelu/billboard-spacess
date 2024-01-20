@@ -5,12 +5,12 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from rest_framework import status
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import Response, status
 
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     PasswordResetRequestSerializer,
     UpdateProfileSerializer,
@@ -29,6 +29,7 @@ class UpdateProfileView(UpdateAPIView):
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
+    permission_classes = [IsOwnerOrReadOnly]
     allowed_methods = ['PUT']
 
     def patch(self, request, *args, **kwargs):
@@ -37,9 +38,6 @@ class UpdateProfileView(UpdateAPIView):
             "message": "MethodNotAllowed",
         }
         return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
 
 
 class PasswordResetRequestView(CreateAPIView):
