@@ -4,7 +4,6 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import Response, status
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .serializers import UpdateProfileSerializer, UserSerializer
 
