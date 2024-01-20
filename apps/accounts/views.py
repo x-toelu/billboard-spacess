@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework.views import Response, status
 
 from .serializers import UpdateProfileSerializer, UserSerializer
@@ -26,3 +27,6 @@ class UpdateProfileView(UpdateAPIView):
             "message": "MethodNotAllowed",
         }
         return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
