@@ -2,8 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from apps.accounts.mixins import PasswordValidatorMixin
 
-class UserSerializer(serializers.ModelSerializer):
+
+class UserSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     password = serializers.CharField(
         min_length=8,
         write_only=True,
@@ -19,18 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
             'password2'
         ]
-
-    def validate(self, attrs):
-        """
-        Validate the password and password2 fields to ensure they match.
-        """
-        password = attrs.get('password')
-        password2 = attrs.get('password2')
-
-        if password != password2:
-            raise serializers.ValidationError('Passwords must match')
-
-        return attrs
 
     def create(self, validated_data):
         validated_data.pop('password2')
@@ -68,7 +58,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
-class PasswordResetSerializer(serializers.Serializer):
+class PasswordResetSerializer(PasswordValidatorMixin, serializers.Serializer):
     """
     Serializer for reseting user's password
     """
