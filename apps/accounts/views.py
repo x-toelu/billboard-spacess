@@ -21,13 +21,16 @@ from .serializers import (
 
 
 class UserCreationView(CreateAPIView):
+    """
+    Allows users to create a new account by providing required user information.
+    """
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
 
 class UpdateProfileView(UpdateAPIView):
     """
-    Updates part of user profile with PUT request.
+    Updates part of user profile.
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
@@ -43,6 +46,13 @@ class UpdateProfileView(UpdateAPIView):
 
 
 class PasswordResetRequestView(CreateAPIView):
+    """
+    Initiates password reset requests.
+
+    Allows users to request a password reset by providing their email address.
+    If the email corresponds to an existing user, a password reset link is generated,
+    and an email containing the link is sent to the user.
+    """
     serializer_class = PasswordResetRequestSerializer
     permission_classes = [AllowAny]
 
@@ -71,6 +81,13 @@ class PasswordResetRequestView(CreateAPIView):
 
 
 class PasswordResetConfirmView(CreateAPIView):
+    """
+    Confirms password reset requests.
+
+    Allow users to confirm password reset requests by providing a valid
+    UID, token, and a new password. The provided UID and token are used to verify
+    the validity of the reset link, and if valid, the user's password is updated
+    """
     serializer_class = PasswordResetSerializer
     permission_classes = [AllowAny]
 
