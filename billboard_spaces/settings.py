@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     "apps.accounts",
 
     # third party apps
-    'drf_yasg',
+    "drf_yasg",
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
 ]
@@ -63,6 +64,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -167,6 +169,11 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+
+# CORS settings
+
+CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST')
 
 # REST Framework settings
 
