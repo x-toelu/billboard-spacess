@@ -145,7 +145,9 @@ STATIC_URL = "static/"
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STORAGES = {'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'}}
+STORAGES = {
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'}
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -211,6 +213,21 @@ if not DEBUG:
         },
     }
 
+
+# Frontend Related Settings
+
+FRONTEND_BASE_URL = env('FRONTEND_BASE_URL')
+FRONTEND_RESET_URL = f"{env('FRONTEND_BASE_URL')}{env('FRONTEND_RESET_PATH')}"
+
+
+# Email Settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'your_account@gmail.com'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Security
 
