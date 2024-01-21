@@ -229,12 +229,15 @@ FRONTEND_RESET_URL = f"{env('FRONTEND_BASE_URL')}{env('FRONTEND_RESET_PATH')}"
 
 # Email Settings
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'your_account@gmail.com'
-EMAIL_HOST_PASSWORD = ''
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+MAILJET_API_KEY = env('MAILJET_API_KEY')
+MAILJET_API_SECRET = env('MAILJET_API_SECRET')
+EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL')
+EMAIL_TIMEOUT = env.int('EMAIL_TIMEOUT')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 # Security
 
