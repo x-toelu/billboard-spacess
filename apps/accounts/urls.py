@@ -11,10 +11,12 @@ from .views import (
     PasswordResetRequestView,
     UpdateProfileView,
     UserCreationView,
+    UserDetailView,
 )
 
 urlpatterns = [
     path('create/', UserCreationView.as_view(), name='users_create'),
+    path('users/<str:pk>/', UserDetailView.as_view(), name='users_detail'),
     path(
         'update-profile/<str:pk>/',
         UpdateProfileView.as_view(),

@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import Response, status
@@ -16,6 +16,7 @@ from .serializers import (
     PasswordResetRequestSerializer,
     PasswordResetSerializer,
     UpdateProfileSerializer,
+    UserCreationSerializer,
     UserSerializer,
 )
 
@@ -24,9 +25,16 @@ class UserCreationView(CreateAPIView):
     """
     Allows users to create a new account by providing required user information.
     """
-    serializer_class = UserSerializer
+    serializer_class = UserCreationSerializer
     permission_classes = [AllowAny]
 
+
+class UserDetailView(RetrieveAPIView):
+    """
+    Returns detailed information about a user.
+    """
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
 
 class UpdateProfileView(UpdateAPIView):
     """
