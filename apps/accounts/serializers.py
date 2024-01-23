@@ -45,8 +45,9 @@ class UserSerializer(MiniUserSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = MiniUserSerializer.Meta.fields + \
-            ['phone_number', 'state_of_residence', 'user_field',]
+        fields = MiniUserSerializer.Meta.fields + [
+            'phone_number', 'state_of_residence', 'user_field',
+        ]
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
