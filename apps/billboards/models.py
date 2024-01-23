@@ -39,7 +39,7 @@ class Billboard(models.Model):
         ordering = ['-created_at']
 
     def __str__(self) -> str:
-        return f"{self.owner}'s billboard at {self.location}"
+        return f"{self.owner.display_name}'s billboard at {self.location}"
 
     @property
     def target_audience(self):
@@ -47,4 +47,7 @@ class Billboard(models.Model):
 
     @property
     def available_date(self):
-        return self.available_date_from - self.available_date_to
+        formatted_from = self.available_date_from.strftime("%B %d, %Y")
+        formatted_to = self.available_date_to.strftime("%B %d, %Y")
+
+        return f"{formatted_from} to {formatted_to}"
