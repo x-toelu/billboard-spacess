@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     # local apps
     "apps.accounts",
+    "apps.billboards",
 
     # third party apps
     "drf_yasg",
@@ -98,15 +99,8 @@ WSGI_APPLICATION = "billboard_spaces.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
-if not DEBUG:
-    DATABASES = {'default': env.db('DATABASE_URL')}
+DATABASES = {'default': env.db('DATABASE_URL')}
 
 
 # Password validation
