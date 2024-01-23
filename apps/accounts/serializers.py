@@ -5,7 +5,7 @@ from rest_framework import serializers
 from apps.accounts.mixins import PasswordValidatorMixin
 
 
-class UserSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
+class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     password = serializers.CharField(
         min_length=8,
         write_only=True,
@@ -25,6 +25,29 @@ class UserSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         return get_user_model().objects.create_user(**validated_data)
+
+
+class MiniUserSerializer(serializers.ModelSerializer):
+    business_name = serializers.CharField(source='display_name')
+
+    class Meta:
+        model = get_user_model()
+        fields = [
+            'id',
+            'email',
+            'full_name',
+            'business_name',
+        ]
+
+
+class UserSerializer(MiniUserSerializer):
+    business_name = serializers.CharField(source='display_name')
+
+    class Meta:
+        model = get_user_model()
+        fields = MiniUserSerializer.Meta.fields + [
+            'phone_number', 'state_of_residence', 'user_field',
+        ]
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
