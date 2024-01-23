@@ -16,7 +16,7 @@ from .serializers import (
     PasswordResetRequestSerializer,
     PasswordResetSerializer,
     UpdateProfileSerializer,
-    UserSerializer,
+    UserCreationSerializer,
 )
 
 
@@ -24,7 +24,7 @@ class UserCreationView(CreateAPIView):
     """
     Allows users to create a new account by providing required user information.
     """
-    serializer_class = UserSerializer
+    serializer_class = UserCreationSerializer
     permission_classes = [AllowAny]
 
 

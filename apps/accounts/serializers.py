@@ -5,7 +5,7 @@ from rest_framework import serializers
 from apps.accounts.mixins import PasswordValidatorMixin
 
 
-class UserSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
+class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     password = serializers.CharField(
         min_length=8,
         write_only=True,
