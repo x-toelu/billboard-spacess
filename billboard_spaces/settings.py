@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 import environ
 
 # Initialise environment variables
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
 
     # third party apps
     "drf_yasg",
+    "cloudinary",
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
@@ -182,6 +186,14 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.views.custom_exception_handler',
 }
 
+
+# Cloudinary settings
+
+cloudinary.config(
+    cloud_name=env('CLOUD_NAME'),
+    api_key=env('CLOUDINARY_API_KEY'),
+    api_secret=env('CLOUDINARY_API_SECRET')
+)
 
 # Logging settings
 
