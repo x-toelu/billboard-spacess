@@ -27,6 +27,28 @@ class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer
         return get_user_model().objects.create_user(**validated_data)
 
 
+class MiniUserSerializer(serializers.ModelSerializer):
+    business_name = serializers.CharField(source='display_name')
+
+    class Meta:
+        model = get_user_model()
+        fields = [
+            'id',
+            'email',
+            'full_name',
+            'business_name',
+        ]
+
+
+class UserSerializer(MiniUserSerializer):
+    business_name = serializers.CharField(source='display_name')
+
+    class Meta:
+        model = get_user_model()
+        fields = MiniUserSerializer.Meta.fields + \
+            ['phone_number', 'state_of_residence', 'user_field',]
+
+
 class UpdateProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(required=True)
     phone_number = serializers.CharField(required=True)
