@@ -30,6 +30,8 @@ class Billboard(models.Model):
     target_audience_from = models.PositiveIntegerField()
     target_audience_to = models.PositiveIntegerField()
 
+    booked = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
