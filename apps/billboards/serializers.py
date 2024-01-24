@@ -30,8 +30,8 @@ class BillboardSerializer(serializers.ModelSerializer):
         return  f"{days} days"
 
     def get_available_date_in_weeks(self, obj):
-        weeks = (obj.available_date_to - obj.available_date_from).days // 7
-        return  f"{weeks} weeks"
+        weeks = (obj.available_date_to - obj.available_date_from).days / 7
+        return  f"{round(weeks, 1)} weeks"
 
     def get_available_date_in_months(self, obj):
         months = relativedelta(obj.available_date_to, obj.available_date_from).months
