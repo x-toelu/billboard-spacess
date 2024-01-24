@@ -11,8 +11,12 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 import environ
 
 # Initialise environment variables
@@ -49,9 +53,11 @@ INSTALLED_APPS = [
 
     # local apps
     "apps.accounts",
+    "apps.billboards",
 
     # third party apps
     "drf_yasg",
+    "cloudinary",
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
@@ -98,15 +104,8 @@ WSGI_APPLICATION = "billboard_spaces.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
-if not DEBUG:
-    DATABASES = {'default': env.db('DATABASE_URL')}
+DATABASES = {'default': env.db('DATABASE_URL')}
 
 
 # Password validation
@@ -170,6 +169,11 @@ SWAGGER_SETTINGS = {
     },
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
 
 # CORS settings
 
@@ -188,6 +192,14 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.views.custom_exception_handler',
 }
 
+
+# Cloudinary settings
+
+cloudinary.config(
+    cloud_name=env('CLOUD_NAME'),
+    api_key=env('CLOUDINARY_API_KEY'),
+    api_secret=env('CLOUDINARY_API_SECRET')
+)
 
 # Logging settings
 
