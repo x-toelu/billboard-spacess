@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
@@ -108,7 +109,7 @@ class PasswordResetConfirmView(CreateAPIView):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = get_user_model().objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist) as e:
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
             user = None
 
         # change password if token is valid and not expired.
