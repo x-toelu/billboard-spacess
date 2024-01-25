@@ -126,6 +126,6 @@ class PasswordResetConfirmView(CreateAPIView):
             user.password_reset_otp_created_at = None
             user.save()
 
-            return Response({'detail': 'Password reset successful.'})
+            return Response({'message': 'Password reset successful.'})
         else:
-            return Response({'detail': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
