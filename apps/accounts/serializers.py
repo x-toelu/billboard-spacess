@@ -85,8 +85,7 @@ class PasswordResetSerializer(PasswordValidatorMixin, serializers.Serializer):
     """
     Serializer for reseting user's password
     """
-    uid = serializers.CharField(required=True)
-    token = serializers.CharField(required=True)
+    otp = serializers.CharField(required=True)
     password = serializers.CharField(
         min_length=8,
         write_only=True,
