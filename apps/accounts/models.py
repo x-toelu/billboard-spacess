@@ -61,6 +61,10 @@ class CustomUser(AbstractUser):
     )
     display_name = models.CharField(max_length=255, blank=True, null=True)
 
+    # for password reset
+    password_reset_otp = models.CharField(max_length=6, null=True)
+    password_reset_otp_created_at = models.DateTimeField(null=True)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
