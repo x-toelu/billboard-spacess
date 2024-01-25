@@ -1,10 +1,10 @@
+from datetime import datetime, timedelta
+import random
+import string
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
@@ -35,6 +35,7 @@ class UserDetailView(RetrieveAPIView):
     """
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+
 
 class UpdateProfileView(UpdateAPIView):
     """
@@ -71,15 +72,15 @@ class PasswordResetRequestView(CreateAPIView):
 
         user = get_user_model().objects.filter(email=email).first()
         if user:
-            # Generate token and send reset email
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            reset_link = f'{settings.FRONTEND_RESET_URL}/{uid}/{token}/'
+            otp = ''.join(random.choices(string.digits, k=6))
+            user.password_reset_otp = otp
+            user.password_reset_otp_created_at = datetime.now()
+            user.save()
 
-            # Send email with reset link
+            # Send OTP via email
             send_mail(
-                'Password Reset',
-                f'Click the following link to reset your password: {reset_link}',
+                'Password Reset OTP',
+                f'Your OTP for password reset is: {otp}',
                 settings.DEFAULT_FROM_EMAIL,
                 [email],
                 fail_silently=False,
@@ -93,29 +94,38 @@ class PasswordResetConfirmView(CreateAPIView):
     Confirms password reset requests.
 
     Allow users to confirm password reset requests by providing a valid
-    UID, token, and a new password. The provided UID and token are used to verify
-    the validity of the reset link, and if valid, the user's password is updated
+    OTP, and a new password.
     """
     serializer_class = PasswordResetSerializer
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        serializer = PasswordResetSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        uidb64 = serializer.validated_data.get('uid')
-        token = serializer.validated_data.get('token')
-        password = serializer.validated_data.get('password')
+        email = serializer.validated_data['email']
+        otp = serializer.validated_data['otp']
+        password = serializer.validated_data['password']
 
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            user = get_user_model().objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
-            user = None
+        user = get_user_model().objects.filter(email=email).first()
+        if user and user.password_reset_otp == otp:
+            # Check if OTP is expired
+            expiration_time = user.password_reset_otp_created_at.replace(tzinfo=None) + timedelta(minutes=15)
 
-        # change password if token is valid and not expired.
-        if user and default_token_generator.check_token(user, token):
+            if datetime.now() > expiration_time:
+                return Response(
+                    {'detail': 'OTP has expired. Please request a new one.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # reset password
             user.set_password(password)
             user.save()
+
+            # mark OTP as expired
+            user.password_reset_otp = None
+            user.password_reset_otp_created_at = None
+            user.save()
+
             return Response({'detail': 'Password reset successful.'})
         else:
-            return Response({'detail': 'Invalid reset link.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)

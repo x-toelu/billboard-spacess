@@ -85,6 +85,7 @@ class PasswordResetSerializer(PasswordValidatorMixin, serializers.Serializer):
     """
     Serializer for reseting user's password
     """
+    email = serializers.EmailField(required=True)
     otp = serializers.CharField(required=True)
     password = serializers.CharField(
         min_length=8,
