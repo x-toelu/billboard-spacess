@@ -25,6 +25,7 @@ class BillBoardCreationSerializer(serializers.ModelSerializer):
 
 class BillboardListSerializer(serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Billboard
@@ -34,6 +35,12 @@ class BillboardListSerializer(serializers.ModelSerializer):
             'image',
             'location',
         ]
+    
+    def get_image(self, document):
+        """Returns full image url"""
+        request = self.context.get('request')
+        file_url = document.image.url
+        return request.build_absolute_uri(file_url)
 
 
 class BillboardDetailSerializer(BillboardListSerializer):
