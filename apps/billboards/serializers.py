@@ -5,6 +5,24 @@ from apps.accounts.serializers import MiniUserSerializer
 from dateutil.relativedelta import relativedelta
 
 
+class BillBoardCreationSerializer(serializers.ModelSerializer):
+    owner = MiniUserSerializer(read_only=True)
+    image = serializers.ImageField(required=True)
+
+    class Meta:
+        model = Billboard
+        fields = [
+            'owner',
+            'image',
+            'size',
+            'location',
+            'available_date_from',
+            'available_date_to',
+            'target_audience_from',
+            'target_audience_to',
+        ]
+
+
 class BillboardListSerializer(serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
 
@@ -18,20 +36,16 @@ class BillboardListSerializer(serializers.ModelSerializer):
         ]
 
 
-class BillboardSerializer(serializers.ModelSerializer):
-    owner = MiniUserSerializer(read_only=True)
+class BillboardDetailSerializer(BillboardListSerializer):
     available_date_in_days = serializers.SerializerMethodField()
     available_date_in_weeks = serializers.SerializerMethodField()
     available_date_in_months = serializers.SerializerMethodField()
 
     class Meta:
         model = Billboard
-        fields = [
-            'owner',
-            'image',
+        fields = BillboardListSerializer.Meta.fields + [
             'size',
             'booked',
-            'location',
             'available_date',
             'available_date_in_days',
             'available_date_in_weeks',
@@ -52,21 +66,3 @@ class BillboardSerializer(serializers.ModelSerializer):
         months = relativedelta(obj.available_date_to,
                                obj.available_date_from).months
         return f"{months} months"
-
-
-class BillBoardCreationSerializer(serializers.ModelSerializer):
-    owner = MiniUserSerializer(read_only=True)
-    image = serializers.ImageField(required=True)
-
-    class Meta:
-        model = Billboard
-        fields = [
-            'owner',
-            'image',
-            'size',
-            'location',
-            'available_date_from',
-            'available_date_to',
-            'target_audience_from',
-            'target_audience_to',
-        ]
