@@ -32,6 +32,7 @@ class BillboardListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'owner',
+            'size',
             'image',
             'location',
         ]
@@ -51,7 +52,6 @@ class BillboardDetailSerializer(BillboardListSerializer):
     class Meta:
         model = Billboard
         fields = BillboardListSerializer.Meta.fields + [
-            'size',
             'booked',
             'available_date',
             'available_date_in_days',
