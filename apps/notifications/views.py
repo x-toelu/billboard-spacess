@@ -27,3 +27,21 @@ class NotificationDetailAPIView(RetrieveAPIView):
 
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user)
+
+
+class MarkAllNotificationsAsReadAPIView(GenericAPIView):
+    """
+    Marks all notifications as read.
+    """
+    serializer_class = NotificationSerializer
+
+    def get(self, request, *args, **kwargs):
+        notifications = Notification.objects.filter(user=self.request.user)
+
+        for notif in notifications:
+            notif.mark_as_read()
+
+        return Response({"message": "All notifications marked as read"})
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
