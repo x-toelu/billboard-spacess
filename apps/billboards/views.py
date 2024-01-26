@@ -5,12 +5,10 @@ from .serializers import BillBoardCreationSerializer, BillboardDetailSerializer,
 
 
 class BillboardListView(ListAPIView):
-    queryset = Billboard.objects.all()
     serializer_class = BillboardListSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(booked=False)
+        return Billboard.objects.filter(booked=False)
 
 
 class BillboardCreateView(CreateAPIView):
