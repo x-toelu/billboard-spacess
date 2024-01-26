@@ -36,7 +36,8 @@ class MarkAllNotificationsAsReadAPIView(GenericAPIView):
     serializer_class = NotificationSerializer
 
     def get(self, request, *args, **kwargs):
-        notifications = Notification.objects.filter(user=self.request.user)
+        user = self.request.user
+        notifications = Notification.objects.filter(user=user, is_read=False)
 
         for notif in notifications:
             notif.mark_as_read()
