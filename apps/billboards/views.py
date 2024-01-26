@@ -28,3 +28,11 @@ class BillboardCreateView(CreateAPIView):
 class BillboardDetailView(RetrieveAPIView):
     queryset = Billboard.objects.all()
     serializer_class = BillboardDetailSerializer
+
+
+class BillboardListByCategoryAPIView(ListAPIView):
+    serializer_class = BillboardListSerializer
+
+    def get_queryset(self):
+        category = self.kwargs.get('category')
+        return Billboard.objects.filter(size=category)
