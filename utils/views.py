@@ -69,7 +69,7 @@ def index_view(request):
 class HttpAndHttpsOpenAPISchemaGenerator(OpenAPISchemaGenerator):
     def get_schema(self, request=None, public=False):  # noqa: FBT002
         schema = super().get_schema(request, public)
-        schema.schemes = ['http', 'https']
+        schema.schemes = ['https', 'http']
         return schema
 
 
