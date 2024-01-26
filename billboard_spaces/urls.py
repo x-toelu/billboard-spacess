@@ -27,9 +27,11 @@ handler500 = 'utils.views.handler_500'
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', index_view, name='index-view'),
     path('auth/', include('apps.accounts.urls')),
     path('billboards/', include('apps.billboards.urls')),
+    path('notifications/', include('apps.notifications.urls')),
+
+    path('', index_view, name='index-view'),
     path('docs/', docs_schema_view.with_ui('swagger', cache_timeout=0)),
 ]
 
