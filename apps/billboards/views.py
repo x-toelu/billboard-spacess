@@ -5,12 +5,10 @@ from .serializers import BillBoardCreationSerializer, BillboardDetailSerializer,
 
 
 class BillboardListView(ListAPIView):
-    queryset = Billboard.objects.all()
     serializer_class = BillboardListSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(booked=False)
+        return Billboard.objects.filter(booked=False)
 
 
 class BillboardCreateView(CreateAPIView):
@@ -28,3 +26,11 @@ class BillboardCreateView(CreateAPIView):
 class BillboardDetailView(RetrieveAPIView):
     queryset = Billboard.objects.all()
     serializer_class = BillboardDetailSerializer
+
+
+class BillboardListByCategoryAPIView(ListAPIView):
+    serializer_class = BillboardListSerializer
+
+    def get_queryset(self):
+        category = self.kwargs.get('category')
+        return Billboard.objects.filter(size=category)
