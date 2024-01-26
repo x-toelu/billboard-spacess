@@ -30,6 +30,7 @@ class BillboardDetailView(RetrieveAPIView):
 
 class BillboardListByCategoryAPIView(ListAPIView):
     serializer_class = BillboardListSerializer
+    pagination_class = None
 
     def get_queryset(self):
         category = self.kwargs.get('category')
