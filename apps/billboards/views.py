@@ -1,12 +1,12 @@
 from rest_framework.generics import CreateAPIView, ListAPIView
 
 from .models import Billboard
-from .serializers import BillboardSerializer, BillBoardCreationSerializer
+from .serializers import BillBoardCreationSerializer, BillboardListSerializer
 
 
 class BillboardListView(ListAPIView):
     queryset = Billboard.objects.all()
-    serializer_class = BillboardSerializer
+    serializer_class = BillboardListSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()

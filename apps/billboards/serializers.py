@@ -5,6 +5,19 @@ from apps.accounts.serializers import MiniUserSerializer
 from dateutil.relativedelta import relativedelta
 
 
+class BillboardListSerializer(serializers.ModelSerializer):
+    owner = MiniUserSerializer(read_only=True)
+
+    class Meta:
+        model = Billboard
+        fields = [
+            'id',
+            'owner',
+            'image',
+            'location',
+        ]
+
+
 class BillboardSerializer(serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
     available_date_in_days = serializers.SerializerMethodField()
