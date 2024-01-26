@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # local apps
     "apps.accounts",
     "apps.billboards",
+    "apps.notifications",
 
     # third party apps
     "drf_yasg",
