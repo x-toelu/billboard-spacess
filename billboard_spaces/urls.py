@@ -25,6 +25,9 @@ handler400 = 'utils.views.handler_400'
 handler404 = 'utils.views.handler_404'
 handler500 = 'utils.views.handler_500'
 
+# change admin site header
+admin.site.site_header = "BillBoard Spaces Admin"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('auth/', include('apps.accounts.urls')),
