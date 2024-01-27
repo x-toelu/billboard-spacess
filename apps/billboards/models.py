@@ -21,14 +21,7 @@ class Billboard(models.Model):
     image = CloudinaryField()
     size = models.CharField(max_length=21, choices=SIZE_CHOICES)
     location = models.CharField(max_length=255)
-
-    # available date range
-    available_date_from = models.DateField()
-    available_date_to = models.DateField()
-
-    # target audience range
-    target_audience_from = models.PositiveIntegerField()
-    target_audience_to = models.PositiveIntegerField()
+    target_audience = models.CharField(max_length=255)
 
     booked = models.BooleanField(default=False)
 
@@ -41,13 +34,3 @@ class Billboard(models.Model):
     def __str__(self) -> str:
         return f"{self.owner.display_name}'s billboard at {self.location}"
 
-    @property
-    def target_audience(self):
-        return f"{self.target_audience_from} to {self.target_audience_to}"
-
-    @property
-    def available_date(self):
-        formatted_from = self.available_date_from.strftime("%B %d, %Y")
-        formatted_to = self.available_date_to.strftime("%B %d, %Y")
-
-        return f"{formatted_from} to {formatted_to}"
