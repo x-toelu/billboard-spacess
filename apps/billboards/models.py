@@ -24,12 +24,13 @@ class Billboard(models.Model):
     target_audience = models.CharField(max_length=255)
 
     booked = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-is_verified']
 
     def __str__(self) -> str:
         return f"{self.owner.display_name}'s billboard at {self.location}"
