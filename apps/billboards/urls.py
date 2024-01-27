@@ -14,7 +14,7 @@ urlpatterns = [
     path('create/', BillboardCreateView.as_view(), name='billboards-create'),
     path('new/', NewlyAddedBillboardListView.as_view(), name='billboards-new'),
     path(
-        'billboardscategory/<str:category>/',
+        'category/<str:category>/',
         BillboardListByCategoryAPIView.as_view(),
         name='billboard-list-by-category'
     )
