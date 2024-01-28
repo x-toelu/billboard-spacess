@@ -8,7 +8,7 @@ class BillboardListView(ListAPIView):
     serializer_class = BillboardListSerializer
 
     def get_queryset(self):
-        return Billboard.objects.filter(booked=False)
+        return Billboard.objects.filter(booked=False, is_verified=True)
 
 
 class BillboardCreateView(CreateAPIView):
@@ -24,14 +24,20 @@ class BillboardCreateView(CreateAPIView):
 
 
 class BillboardDetailView(RetrieveAPIView):
-    queryset = Billboard.objects.all()
+    queryset = Billboard.objects.filter(is_verified=True)
     serializer_class = BillboardDetailSerializer
 
 
-class BillboardListByCategoryAPIView(ListAPIView):
-    serializer_class = BillboardListSerializer
+class NewlyAddedBillboardListView(BillboardListView):
+    pagination_class = None
+
+    def get_queryset(self):
+        return self.get_queryset()[:5]
+
+
+class BillboardListByCategoryAPIView(BillboardListView):
     pagination_class = None
 
     def get_queryset(self):
         category = self.kwargs.get('category')
-        return Billboard.objects.filter(size=category)
+        return Billboard.objects.filter(size=category, is_verified=True)
