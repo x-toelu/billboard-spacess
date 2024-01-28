@@ -5,6 +5,7 @@ from .views import (
     BillboardDetailView,
     BillboardListView,
     BillboardListByCategoryAPIView,
+    BillboardUserListView,
     NewlyAddedBillboardListView,
 )
 
@@ -13,6 +14,7 @@ urlpatterns = [
     path('<int:pk>/', BillboardDetailView.as_view(), name='billboards-retrieve'),
     path('create/', BillboardCreateView.as_view(), name='billboards-create'),
     path('new/', NewlyAddedBillboardListView.as_view(), name='billboards-new'),
+    path('user/', BillboardUserListView.as_view(), name='billboards-new'),
     path(
         'category/<str:category>/',
         BillboardListByCategoryAPIView.as_view(),
