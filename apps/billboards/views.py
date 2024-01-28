@@ -3,7 +3,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from .models import Billboard
 from .serializers import BillBoardCreationSerializer, BillboardDetailSerializer, BillboardListSerializer
 
-from apps.accounts.permissions import IsOwnerOrReadOnly
+from apps.accounts.permissions import IsOwner
 
 class BillboardListView(ListAPIView):
     serializer_class = BillboardListSerializer
@@ -46,7 +46,7 @@ class BillboardListByCategoryAPIView(BillboardListView):
 
 class BillboardUserListView(BillboardListView):
     pagination_class = None
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsOwner]
 
     def get_queryset(self):
         return super().get_queryset()
