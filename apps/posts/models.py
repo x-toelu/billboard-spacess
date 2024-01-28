@@ -11,7 +11,7 @@ class Post(models.Model):
         on_delete=models.CASCADE
     )
 
-    caption = models.CharField(max_length=500)
+    caption = models.CharField(max_length=500, null=True)
     image = CloudinaryField()
 
     created_at = models.DateTimeField(auto_now_add=True)
