@@ -16,6 +16,7 @@ class BillBoardCreationSerializer(serializers.ModelSerializer):
             'image',
             'size',
             'location',
+            'state',
             'target_audience',
         ]
 
@@ -31,7 +32,7 @@ class BillboardListSerializer(serializers.ModelSerializer):
             'owner',
             'size',
             'image',
-            'location',
+            'full_location',
         ]
 
     def get_image(self, document):
