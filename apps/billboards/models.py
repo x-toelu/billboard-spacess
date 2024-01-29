@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from cloudinary.models import CloudinaryField
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -26,6 +28,12 @@ class Billboard(models.Model):
     location = models.CharField(max_length=255)
     state = models.CharField(max_length=255, choices=NIGERIAN_STATES)
     target_audience = models.CharField(max_length=255)
+
+    price = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
 
     booked = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=True)
