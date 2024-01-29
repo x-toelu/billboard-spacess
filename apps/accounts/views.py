@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import Response, status
 
-from .permissions import IsOwner
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     PasswordResetRequestSerializer,
     PasswordResetSerializer,
@@ -43,7 +43,7 @@ class UpdateProfileView(UpdateAPIView):
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    permission_classes = [IsOwner, IsAuthenticated]
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
     allowed_methods = ['PUT']
 
     def patch(self, request, *args, **kwargs):

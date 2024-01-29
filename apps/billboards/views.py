@@ -3,14 +3,22 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from .models import Billboard
 from .serializers import BillBoardCreationSerializer, BillboardDetailSerializer, BillboardListSerializer
 
-from apps.accounts.permissions import IsOwner
-from rest_framework.permissions import IsAuthenticated
+
 
 class BillboardListView(ListAPIView):
     serializer_class = BillboardListSerializer
 
     def get_queryset(self):
-        return Billboard.objects.filter(booked=False, is_verified=True)
+        queryset = Billboard.objects.filter(booked=False, is_verified=True)
+        state = self.request.query_params.get('state')
+        size = self.request.query_params.get('size')
+
+        if state:
+            queryset = queryset.filter(state=state)
+        if size:
+            queryset = queryset.filter(size=size)
+
+        return queryset
 
 
 class BillboardCreateView(CreateAPIView):
@@ -47,7 +55,6 @@ class BillboardListByCategoryAPIView(BillboardListView):
 
 class BillboardUserListView(BillboardListView):
     pagination_class = None
-    permission_classes = [IsOwner, IsAuthenticated]
 
     def get_queryset(self):
-        return super().get_queryset()
+        return Billboard.objects.filter(booked=False, owner=self.request.user)

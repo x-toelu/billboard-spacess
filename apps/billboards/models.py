@@ -1,8 +1,9 @@
 from cloudinary.models import CloudinaryField
-
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.utils import timezone
+
+from utils.constants import NIGERIAN_STATES
 
 
 class Billboard(models.Model):
@@ -23,14 +24,19 @@ class Billboard(models.Model):
     image = CloudinaryField()
     size = models.CharField(max_length=21, choices=SIZE_CHOICES)
     location = models.CharField(max_length=255)
+    state = models.CharField(max_length=255, choices=NIGERIAN_STATES)
     target_audience = models.CharField(max_length=255)
 
     booked = models.BooleanField(default=False)
-    is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_verified_at = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def full_location(self):
+        return f"{self.location}, {self.state.capitalize()} State."
 
     def save(self, *args, **kwargs):
         if self.is_verified and not self.is_verified_at:

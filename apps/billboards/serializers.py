@@ -16,12 +16,14 @@ class BillBoardCreationSerializer(serializers.ModelSerializer):
             'image',
             'size',
             'location',
+            'state',
             'target_audience',
         ]
 
 
 class BillboardListSerializer(serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
+    location = serializers.CharField(source='full_location')
     image = serializers.SerializerMethodField()
 
     class Meta:
