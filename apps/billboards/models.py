@@ -28,7 +28,7 @@ class Billboard(models.Model):
     target_audience = models.CharField(max_length=255)
 
     booked = models.BooleanField(default=False)
-    is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,7 +36,7 @@ class Billboard(models.Model):
 
     @property
     def full_location(self):
-        return f"{self.location}, {self.state}"
+        return f"{self.location}, {self.state.capitalize()} State."
 
     def save(self, *args, **kwargs):
         if self.is_verified and not self.is_verified_at:

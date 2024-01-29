@@ -23,6 +23,7 @@ class BillBoardCreationSerializer(serializers.ModelSerializer):
 
 class BillboardListSerializer(serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
+    location = serializers.CharField(source='full_location')
     image = serializers.SerializerMethodField()
 
     class Meta:
@@ -32,7 +33,7 @@ class BillboardListSerializer(serializers.ModelSerializer):
             'owner',
             'size',
             'image',
-            'full_location',
+            'location',
         ]
 
     def get_image(self, document):
