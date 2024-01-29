@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from utils.constants import NIGERIAN_STATES, USER_CHOICES
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -23,26 +25,6 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
-    USER_CHOICES = (
-        ('billboard_owner', 'Billboard Owner'),
-        ('state_agent', 'State Agent'),
-        ('advertising_agent', 'Advertising Agent'),
-        ('business_owner', 'Business Owner'),
-    )
-    NIGERIAN_STATES = [
-        ('abia', 'Abia'), ('adamawa', 'Adamawa'), ('akwa_ibom', 'Akwa Ibom'),
-        ('anambra', 'Anambra'), ('bauchi', 'Bauchi'), ('bayelsa', 'Bayelsa'),
-        ('benue', 'Benue'), ('borno', 'Borno'), ('cross_river', 'Cross River'),
-        ('delta', 'Delta'), ('ebonyi', 'Ebonyi'), ('edo', 'Edo'), ('ekiti', 'Ekiti'),
-        ('enugu', 'Enugu'), ('gombe', 'Gombe'), ('imo', 'Imo'), ('jigawa', 'Jigawa'),
-        ('kaduna', 'Kaduna'), ('kano', 'Kano'), ('katsina', 'Katsina'),
-        ('kebbi', 'Kebbi'), ('kogi', 'Kogi'), ('kwara', 'Kwara'), ('lagos', 'Lagos'),
-        ('nasarawa', 'Nasarawa'), ('niger', 'Niger'), ('ogun', 'Ogun'),
-        ('ondo', 'Ondo'), ('osun', 'Osun'), ('oyo', 'Oyo'), ('plateau', 'Plateau'),
-        ('rivers', 'Rivers'), ('sokoto', 'Sokoto'), ('taraba', 'Taraba'),
-        ('yobe', 'Yobe'), ('zamfara', 'Zamfara'), ('fct_abuja', 'FCT (Abuja)')
-    ]
-
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from apps.accounts.mixins import PasswordValidatorMixin
 
+from utils.constants import NIGERIAN_STATES, USER_CHOICES
 
 class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     password = serializers.CharField(
@@ -56,11 +57,11 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(required=True)
     user_field = serializers.ChoiceField(
         required=True,
-        choices=get_user_model().USER_CHOICES
+        choices=USER_CHOICES
     )
     state_of_residence = serializers.ChoiceField(
         required=True,
-        choices=get_user_model().NIGERIAN_STATES
+        choices=NIGERIAN_STATES
     )
 
     class Meta:
