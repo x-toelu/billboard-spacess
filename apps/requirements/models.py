@@ -1,9 +1,9 @@
+from cloudinary.models import CloudinaryField
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 from utils.constants import NIGERIAN_STATES
-from cloudinary.models import CloudinaryField
 
 
 class BillboardRequirement(models.Model):
@@ -19,8 +19,9 @@ class BillboardRequirement(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         if not self.link and not self.document:
             raise ValidationError(
                 "Either a link or a document must be provided."
             )
+        super().save(*args, **kwargs)
