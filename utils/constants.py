@@ -1,3 +1,6 @@
+MONTHS_IN_YEAR = 12
+WEEKS_IN_MONTH = 4
+
 NIGERIAN_STATES = [
     ('abia', 'Abia'), ('adamawa', 'Adamawa'), ('akwa_ibom', 'Akwa Ibom'),
     ('anambra', 'Anambra'), ('bauchi', 'Bauchi'), ('bayelsa', 'Bayelsa'),
