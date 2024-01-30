@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from utils.constants import NIGERIAN_STATES
+from cloudinary.models import CloudinaryField
 
 
 class BillboardRequirement(models.Model):
@@ -13,8 +14,8 @@ class BillboardRequirement(models.Model):
         null=True
     )
     state = models.CharField(max_length=255, choices=NIGERIAN_STATES)
-    link = models.URLField(max_length=255, null=True)
-    document = models.FileField(null=True)
+    link = models.URLField(max_length=255, blank=True, null=True)
+    document = CloudinaryField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
