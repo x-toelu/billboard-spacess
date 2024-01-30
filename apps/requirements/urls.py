@@ -1,12 +1,12 @@
 from django.urls import path
 
-from .views import StateBillBoardRequirementListView
+from .views import StateBillBoardRequirementListView, StateListView
 
 urlpatterns = [
+    path('states/', StateListView.as_view(), name='states-list'),
     path(
-        '<str:state>/',
+        'states/<str:state>/',
         StateBillBoardRequirementListView.as_view(),
-        name='billboard-requirements-list'
+        name='state-billboard-requirements'
     ),
-
 ]
