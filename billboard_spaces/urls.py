@@ -34,6 +34,7 @@ urlpatterns = [
     path('billboards/', include('apps.billboards.urls')),
     path('notifications/', include('apps.notifications.urls')),
     path('posts/', include('apps.posts.urls')),
+    path('requirements/', include('apps.requirements.urls')),
 
     path('', index_view, name='index-view'),
     path('docs/', docs_schema_view.with_ui('swagger', cache_timeout=0)),

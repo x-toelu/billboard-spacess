@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "apps.notifications",
     "apps.posts",
     "apps.bookings",
+    "apps.requirements",
 
     # third party apps
     "drf_yasg",
