@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView, Response
@@ -38,3 +38,11 @@ class StateListView(APIView):
             state_list.append(data)
 
         return Response(state_list)
+
+
+class UploadRequirementView(CreateAPIView):
+    serializer_class = BillboardRequirementSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        return serializer.save(user=user)
