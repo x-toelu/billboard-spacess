@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "apps.billboards",
     "apps.notifications",
     "apps.posts",
+    "apps.bookings",
 
     # third party apps
     "drf_yasg",
