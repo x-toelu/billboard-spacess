@@ -23,11 +23,6 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-
-class State(models.Model):
-    name = models.CharField(max_length=225, choices=NIGERIAN_STATES)
-
-
 class CustomUser(AbstractUser):
     id = models.UUIDField(
         primary_key=True,
