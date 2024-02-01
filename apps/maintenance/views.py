@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from rest_framework.generics import CreateAPIView
 
-# Create your views here.
+from .serializers import MaintenanceBookingSerializer
+
+
+class MaintenanceBookingCreateView(CreateAPIView):
+    serializer_class = MaintenanceBookingSerializer
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        return serializer.save(user=user)
