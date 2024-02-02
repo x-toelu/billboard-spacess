@@ -24,7 +24,7 @@ class BillBoardBookingCreateView(CreateAPIView):
 
         pstack_data = paystack.initialise_payment(
             booking.user.email,
-            str(booking.amount)
+            str(booking.amount * 100)
         )
 
         if pstack_data['status']:
@@ -55,7 +55,6 @@ class VerifyPaymentView(GenericAPIView):
             # Update the booked status of the associated billboard
             booking.billboard.booked = True
             booking.billboard.save()
-
 
             return Response({'message': 'Payment successful'})
 
