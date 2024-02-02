@@ -3,19 +3,18 @@ from django.conf import settings
 
 
 class PayStackSerivce:
-    def __init__(self, email):
+    def __init__(self):
         self.headers = {
             'Authorization': f'Bearer {settings.PAYSTACK_API_KEY}',
             'Content-Type': 'application/json'
         }
-        self.email = email
         self.currency = "NGN"
         self.session = requests.Session()
 
-    def initialise_payment(self, amount):
+    def initialise_payment(self, email, amount):
         url = "https://api.paystack.co/transaction/initialize"
         payload = {
-            "email": self.email,
+            "email": email,
             "amount": amount,
             "currency": self.currency,
         }
