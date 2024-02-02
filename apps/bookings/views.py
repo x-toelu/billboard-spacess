@@ -11,4 +11,7 @@ class BillBoardBookingCreateView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        return serializer.save(user=user)
+        billboard_id = self.kwargs.get('billboard_id')
+        billboard = get_object_or_404(Billboard, id=billboard_id)
+
+        return serializer.save(user=user, billboard=billboard)
