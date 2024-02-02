@@ -6,10 +6,10 @@ from .models import Booking
 
 
 class BillboardBookingSerializer(serializers.ModelSerializer):
-    billboard = BillboardListSerializer(read_only=True)
 
     class Meta:
         model = Booking
+        read_only_fields = ['billboard']
         fields = [
             'billboard',
             'period',
