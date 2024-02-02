@@ -37,3 +37,26 @@ class BillBoardBookingCreateView(CreateAPIView):
             {'status': False, 'message': 'Couldn\'t process payment, try again'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class VerifyPaymentView(GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        booking_id = kwargs.get('booking_id')
+        booking = get_object_or_404(Booking, pk=booking_id)
+
+        if booking.paid:
+            return Response({'message': 'Payment successful'})
+
+        paystack = PayStackSerivce()
+        if paystack.verify_payment(booking.paystack_ref):
+            booking.paid = True
+            booking.save()
+
+            # Update the booked status of the associated billboard
+            booking.billboard.booked = True
+            booking.billboard.save()
+
+
+            return Response({'message': 'Payment successful'})
+
+        return Response({'message': 'Payment failed, try again'})
