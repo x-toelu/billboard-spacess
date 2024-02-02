@@ -28,6 +28,7 @@ class Booking(models.Model):
     timeline = models.PositiveSmallIntegerField()
 
     paid = models.BooleanField(default=False)
+    paystack_ref = models.CharField(max_length=100, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
