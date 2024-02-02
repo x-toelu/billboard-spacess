@@ -14,21 +14,18 @@ class PayStackSerivce:
 
     def initialise_payment(self, amount):
         url = "https://api.paystack.co/transaction/initialize"
-        data = {
+        payload = {
             "email": self.email,
             "amount": amount,
+            "currency": self.currency,
         }
 
-        response = self.session.get(url, headers=self.headers, data=data)
-        response_data = response.json()
+        response = self.session.post(url, headers=self.headers, json=payload)
 
-        return response_data
+        return response.json()
 
     def verify_payment(self, paystack_ref):
         url = f"https://api.paystack.co/transaction/verify/{paystack_ref}"
         response = self.session.get(url, headers=self.headers)
 
-        if response.json()["status"] == "true":
-            return True
-
-        return False
+        return response.json()["status"]
