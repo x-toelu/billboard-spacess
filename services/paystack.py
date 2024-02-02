@@ -27,4 +27,10 @@ class PayStackSerivce:
         url = f"https://api.paystack.co/transaction/verify/{paystack_ref}"
         response = self.session.get(url, headers=self.headers)
 
-        return response.json()["status"]
+        while True:
+            if response.json()["data"]["status"] == "success":
+                return True
+            elif response.json()["data"]["status"] in ["ongoing", "pending", "processing", "queued"]:
+                continue
+            else:
+                return False
