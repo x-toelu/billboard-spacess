@@ -34,6 +34,7 @@ urlpatterns = [
     path('billboards/', include('apps.billboards.urls')),
     path('notifications/', include('apps.notifications.urls')),
     path('posts/', include('apps.posts.urls')),
+    path('billboard-bookings/', include('apps.bookings.urls')),
     path('requirements/', include('apps.requirements.urls')),
     path('maintenance/', include('apps.maintenance.urls')),
 
