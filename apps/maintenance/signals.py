@@ -12,10 +12,10 @@ def send_maintenance_email(sender, instance, created, **kwargs):
     """
     Alert admins about maintenance booking through email.
     """
-    superusers = get_user_model().objects.filter(is_staff=True)
-    superuser_emails = superusers.values_list('email', flat=True)
-
     if created:
+        admins = get_user_model().objects.filter(is_staff=True)
+        admins_emails = admins.values_list('email', flat=True)
+
         message = f"""
         {instance.user.display_name} would like a maintenace on
         {instance.preferred_date} at {instance.preferred_date} beacause; {instance.description}
@@ -24,6 +24,6 @@ def send_maintenance_email(sender, instance, created, **kwargs):
             f'{instance.user.display_name} booked for maintenance',
             message,
             settings.DEFAULT_FROM_EMAIL,
-            superuser_emails,
+            admins_emails,
             fail_silently=False
         )
