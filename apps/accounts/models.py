@@ -1,27 +1,13 @@
 import uuid
 
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from utils.constants import NIGERIAN_STATES, USER_CHOICES
 
+from .managers import CustomUserManager
 
-class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(
@@ -31,7 +17,10 @@ class CustomUser(AbstractUser):
         unique=True
     )
     username = None
+
     email = models.EmailField(_("email address"), max_length=100, unique=True)
+
+    # Update profile requirements
     user_field = models.CharField(
         max_length=20, choices=USER_CHOICES, blank=True, null=True
     )
@@ -42,7 +31,7 @@ class CustomUser(AbstractUser):
     )
     display_name = models.CharField(max_length=255, blank=True, null=True)
 
-    # for password reset
+    # Password reset rqeuirements
     password_reset_otp = models.CharField(max_length=6, null=True)
     password_reset_otp_created_at = models.DateTimeField(null=True)
 
