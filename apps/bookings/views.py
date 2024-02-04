@@ -31,7 +31,7 @@ class BillBoardBookingCreateView(CreateAPIView):
             booking.paystack_ref = pstack_data['data']['reference']
             booking.save()
 
-            return Response(pstack_data['data'])
+            return Response({'id': booking.id, **pstack_data['data']})
 
         return Response(
             {'status': False, 'message': 'Couldn\'t process payment, try again'},
