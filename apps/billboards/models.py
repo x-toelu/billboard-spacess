@@ -35,7 +35,7 @@ class Billboard(models.Model):
         default=Decimal('0.00')
     )
 
-    booked = models.BooleanField(default=False)
+    is_booked = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

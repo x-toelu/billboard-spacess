@@ -47,7 +47,7 @@ class BillboardDetailSerializer(BillboardListSerializer):
     class Meta:
         model = Billboard
         fields = BillboardListSerializer.Meta.fields + [
-            'booked',
+            'is_booked',
             'target_audience',
             'created_at',
         ]
