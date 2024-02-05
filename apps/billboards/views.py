@@ -41,7 +41,7 @@ class NewlyAddedBillboardListView(BillboardListView):
     pagination_class = None
 
     def get_queryset(self):
-        return self.get_queryset()[:5]
+        return super().get_queryset()[:5]
 
 
 class BillboardListByCategoryAPIView(BillboardListView):
