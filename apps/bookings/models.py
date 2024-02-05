@@ -27,7 +27,7 @@ class Booking(models.Model):
     period = models.CharField(max_length=8, choices=BOOKING_PERIOD)
     timeline = models.PositiveSmallIntegerField()
 
-    paid = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
     paystack_ref = models.CharField(max_length=100, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

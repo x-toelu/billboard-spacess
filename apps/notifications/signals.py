@@ -28,7 +28,7 @@ def new_maintenance_booking_notif(sender, instance, created, **kwargs):
     """
     if created:
         Notification.objects.create(
-            user=instance.owner,
+            user=instance.user,
             type='congratulations',
             message=f'Maintenance booking successful for {instance.full_location}'
         )

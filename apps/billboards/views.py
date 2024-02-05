@@ -4,12 +4,11 @@ from .models import Billboard
 from .serializers import BillBoardCreationSerializer, BillboardDetailSerializer, BillboardListSerializer
 
 
-
 class BillboardListView(ListAPIView):
     serializer_class = BillboardListSerializer
 
     def get_queryset(self):
-        queryset = Billboard.objects.filter(booked=False, is_verified=True)
+        queryset = Billboard.objects.filter(is_booked=False, is_verified=True)
         state = self.request.query_params.get('state')
         size = self.request.query_params.get('size')
 
@@ -42,7 +41,7 @@ class NewlyAddedBillboardListView(BillboardListView):
     pagination_class = None
 
     def get_queryset(self):
-        return self.get_queryset()[:5]
+        return super().get_queryset()[:5]
 
 
 class BillboardListByCategoryAPIView(BillboardListView):
@@ -57,4 +56,4 @@ class BillboardUserListView(BillboardListView):
     pagination_class = None
 
     def get_queryset(self):
-        return Billboard.objects.filter(booked=False, owner=self.request.user)
+        return Billboard.objects.filter(is_booked=False, owner=self.request.user)
