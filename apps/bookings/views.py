@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import CreateAPIView, GenericAPIView
-from rest_framework.views import Response, status
+from rest_framework.generics import CreateAPIView
+from rest_framework.views import APIView, Response, status
 
 from apps.billboards.models import Billboard
 from services.paystack import PayStackSerivce
@@ -39,7 +39,7 @@ class BillBoardBookingCreateView(CreateAPIView):
         )
 
 
-class VerifyPaymentView(GenericAPIView):
+class VerifyPaymentView(APIView):
     def get(self, request, *args, **kwargs):
         booking_id = kwargs.get('booking_id')
         booking = get_object_or_404(Booking, pk=booking_id)
