@@ -44,12 +44,12 @@ class VerifyPaymentView(GenericAPIView):
         booking_id = kwargs.get('booking_id')
         booking = get_object_or_404(Booking, pk=booking_id)
 
-        if booking.paid:
+        if booking.is_paid:
             return Response({'message': 'Payment successful'})
 
         paystack = PayStackSerivce()
         if paystack.verify_payment(booking.paystack_ref):
-            booking.paid = True
+            booking.is_paid = True
             booking.save()
 
             # Update the booked status of the associated billboard
