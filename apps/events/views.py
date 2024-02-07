@@ -10,4 +10,5 @@ class EventListView(ListAPIView):
 
 
 class EventDetailView(RetrieveAPIView):
+    queryset = Event.objects.all()
     serializer_class = EventSerializer
