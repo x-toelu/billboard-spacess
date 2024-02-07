@@ -22,3 +22,24 @@ USER_CHOICES = (
     ('advertising_agent', 'Advertising Agent'),
     ('business_owner', 'Business Owner'),
 )
+
+
+SUBSCRIBERS_FEATURES = {
+    'free': {
+        'max_billboards_upload': 3,
+        'max_billboards_sale': 2,
+        'analytics': False,
+    },
+
+    'basic': {
+        'max_billboards_upload': 5,
+        'max_billboards_sale': 3,
+        'analytics': False,
+    },
+
+    'pro': {
+        'max_billboards_upload': float('inf'),
+        'max_billboards_sale': float('inf'),
+        'analytics': True,
+    }
+}
