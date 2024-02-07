@@ -3,8 +3,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from apps.accounts.mixins import PasswordValidatorMixin
-
 from utils.constants import NIGERIAN_STATES, USER_CHOICES
+
 
 class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     password = serializers.CharField(
