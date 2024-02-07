@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "apps.requirements",
     "apps.maintenance",
     "apps.events",
+    "apps.subscriptions",
 
     # third party apps
     "drf_yasg",
