@@ -14,7 +14,7 @@ class CustomUserAdmin(UserAdmin):
         (
             'Personal info',
             {
-                'fields': ('full_name', 'display_name', 'phone_number', 'state_of_residence', 'user_field')
+                'fields': ('full_name', 'display_name', 'phone_number', 'state', 'user_field')
             }
         ),
         (
@@ -33,7 +33,7 @@ class CustomUserAdmin(UserAdmin):
                 'classes': ('wide',),
                 'fields': (
                     'email', 'password1', 'password2', 'user_field', 'full_name',
-                    'phone_number', 'state_of_residence', 'display_name'
+                    'phone_number', 'state', 'display_name'
                 ),
             }
         ),

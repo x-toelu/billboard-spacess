@@ -33,7 +33,7 @@ class CustomUser(AbstractUser):
         choices=Country.choices,
         default=Country.NIGERIA
     )
-    state_of_residence = models.CharField(
+    state = models.CharField(
         max_length=20,
         choices=State.choices,
         null=True

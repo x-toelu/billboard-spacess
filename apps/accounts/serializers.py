@@ -47,7 +47,7 @@ class UserSerializer(MiniUserSerializer):
     class Meta:
         model = get_user_model()
         fields = MiniUserSerializer.Meta.fields + [
-            'phone_number', 'state_of_residence', 'user_field',
+            'phone_number', 'state', 'user_field',
         ]
 
 
@@ -59,7 +59,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         required=True,
         choices=UserField.choices,
     )
-    state_of_residence = serializers.ChoiceField(
+    state = serializers.ChoiceField(
         required=True,
         choices=State.choices,
     )
@@ -70,7 +70,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'user_field',
             'full_name',
             'phone_number',
-            'state_of_residence',
+            'state',
             'display_name'
         ]
 
