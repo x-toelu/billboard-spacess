@@ -1,6 +1,8 @@
 MONTHS_IN_YEAR = 12
 WEEKS_IN_MONTH = 4
 
+SUBUNIT_CURRENCY = 100
+
 SUBSCRIBERS_FEATURES = {
     'free': {
         'max_billboards_upload': 3,

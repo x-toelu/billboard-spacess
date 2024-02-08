@@ -1,6 +1,8 @@
 import requests
 from django.conf import settings
 
+from utils.constants import SUBUNIT_CURRENCY
+
 
 class PayStackSerivce:
     def __init__(self):
@@ -11,11 +13,11 @@ class PayStackSerivce:
         self.currency = "NGN"
         self.session = requests.Session()
 
-    def initialise_payment(self, email, amount):
+    def initialise_payment(self, email: str, amount: str):
         url = "https://api.paystack.co/transaction/initialize"
         payload = {
             "email": email,
-            "amount": amount,
+            "amount": str(amount * SUBUNIT_CURRENCY),
             "currency": self.currency,
         }
 
