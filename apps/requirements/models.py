@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from rest_framework.exceptions import ValidationError
 
-from utils.constants import NIGERIAN_STATES
+from apps.accounts.choices import State
 
 
 class BillboardRequirement(models.Model):
@@ -13,7 +13,7 @@ class BillboardRequirement(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    state = models.CharField(max_length=255, choices=NIGERIAN_STATES)
+    state = models.CharField(max_length=255, choices=State.choices)
     link = models.URLField(max_length=255, blank=True, null=True)
     document = CloudinaryField(blank=True, null=True)
 
