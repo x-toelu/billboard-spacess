@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from apps.accounts.mixins import PasswordValidatorMixin
-from utils.constants import NIGERIAN_STATES, USER_CHOICES
+from .choices import State, UserField
+from .mixins import PasswordValidatorMixin
 
 
 class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
@@ -57,11 +57,11 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(required=True)
     user_field = serializers.ChoiceField(
         required=True,
-        choices=USER_CHOICES
+        choices=UserField.choices,
     )
     state_of_residence = serializers.ChoiceField(
         required=True,
-        choices=NIGERIAN_STATES
+        choices=State.choices,
     )
 
     class Meta:
