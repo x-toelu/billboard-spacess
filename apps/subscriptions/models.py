@@ -15,8 +15,7 @@ class Subscription(models.Model):
         choices=SubscriptionType.choices,
         default=SubscriptionType.FREE
     )
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField(blank=True, null=True)
+    expires_at = models.DateTimeField(null=True)
 
     is_active = models.BooleanField(default=True)
 
