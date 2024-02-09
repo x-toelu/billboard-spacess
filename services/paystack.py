@@ -36,3 +36,14 @@ class PayStackSerivce:
                 continue
             else:
                 return False
+
+    def create_subscription(self, email: str, plan: str):
+        url = "https://api.paystack.co/subscription"
+        payload = {
+            "customer": email,
+            "plan": plan,
+        }
+
+        response = self.session.post(url, headers=self.headers, json=payload)
+
+        return response.json()
