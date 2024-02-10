@@ -6,12 +6,16 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    RetrieveAPIView,
+)
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import Response, status
 
-from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     PasswordResetRequestSerializer,
     PasswordResetSerializer,
@@ -37,21 +41,17 @@ class UserDetailView(RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UpdateProfileView(UpdateAPIView):
+class UpdateProfileView(UpdateModelMixin, GenericAPIView):
     """
     Updates part of user profile.
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
-    allowed_methods = ['PUT']
+    permission_classes = [AllowAny]
 
-    def patch(self, request, *args, **kwargs):
-        error_data = {
-            "errors": ["Method 'PATCH' not allowed."],
-            "message": "MethodNotAllowed",
-        }
-        return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
 
 
 class PasswordResetRequestView(CreateAPIView):
