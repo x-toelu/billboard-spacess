@@ -20,6 +20,10 @@ class Subscription(models.Model):
     )
     expires_at = models.DateTimeField(null=True)
 
+    # paystack subscription requirements
+    paystack_sub_code = models.CharField(max_length=100, null=True)
+    paystack_email_token = models.CharField(max_length=100, null=True)
+
     is_active = models.BooleanField(default=True)
 
     @property
