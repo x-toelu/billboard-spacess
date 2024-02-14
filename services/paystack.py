@@ -2,6 +2,7 @@ import requests
 from django.conf import settings
 
 from utils.constants import SUBSCRIBERS_FEATURES, SUBUNIT_CURRENCY
+from django.utils import timezone
 
 
 class PayStackSerivce:
@@ -42,6 +43,7 @@ class PayStackSerivce:
         payload = {
             "customer": email,
             "plan": SUBSCRIBERS_FEATURES[plan]['plan_code'],
+            "start_date": timezone.localtime().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
         response = self.session.post(url, headers=self.headers, json=payload)
