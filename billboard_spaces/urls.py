@@ -38,6 +38,7 @@ urlpatterns = [
     path('requirements/', include('apps.requirements.urls')),
     path('maintenance/', include('apps.maintenance.urls')),
     path('events/', include('apps.events.urls')),
+    path('subscriptions/', include('apps.subscriptions.urls')),
 
     path('', index_view, name='index-view'),
     path('docs/', docs_schema_view.with_ui('swagger', cache_timeout=0)),
