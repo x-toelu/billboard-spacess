@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from .views import (
+    GoogleSignInView,
     PasswordResetConfirmView,
     PasswordResetRequestView,
     UpdateProfileView,
@@ -37,4 +38,5 @@ urlpatterns = [
         name='password-reset-confirm'
     ),
 
+    path("google-signup/", GoogleSignInView.as_view(), name='google-signup')
 ]

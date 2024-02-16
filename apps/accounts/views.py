@@ -1,28 +1,20 @@
-from datetime import datetime, timedelta
 import random
 import string
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-
-from rest_framework.generics import (
-    CreateAPIView,
-    GenericAPIView,
-    RetrieveAPIView,
-)
+from django.shortcuts import redirect
+from rest_framework.generics import (CreateAPIView, GenericAPIView,
+                                     RetrieveAPIView)
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework.views import Response, status
+from rest_framework.views import APIView, Response, status
 
-from .serializers import (
-    PasswordResetRequestSerializer,
-    PasswordResetSerializer,
-    UpdateProfileSerializer,
-    UserCreationSerializer,
-    UserSerializer,
-)
+from .serializers import (PasswordResetRequestSerializer,
+                          PasswordResetSerializer, UpdateProfileSerializer,
+                          UserCreationSerializer, UserSerializer)
 
 
 class UserCreationView(CreateAPIView):
@@ -51,7 +43,6 @@ class UpdateProfileView(UpdateModelMixin, GenericAPIView):
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-
 
 
 class PasswordResetRequestView(CreateAPIView):
@@ -129,3 +120,15 @@ class PasswordResetConfirmView(CreateAPIView):
             return Response({'message': 'Password reset successful.'})
         else:
             return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#  Google Auth
+
+
+class GoogleSignInView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+
+        return redirect(redirect_url)
