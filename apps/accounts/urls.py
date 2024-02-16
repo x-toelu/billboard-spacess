@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import (
 
 from .views import (
     GoogleSignInView,
+    GoogleRedirectURIView,
     PasswordResetConfirmView,
     PasswordResetRequestView,
     UpdateProfileView,
@@ -38,5 +39,6 @@ urlpatterns = [
         name='password-reset-confirm'
     ),
 
-    path("google-signup/", GoogleSignInView.as_view(), name='google-signup')
+    path("google-signup/", GoogleSignInView.as_view(), name='google-signup'),
+    path("google-redirect/", GoogleRedirectURIView.as_view(), name='google-redirect'),
 ]

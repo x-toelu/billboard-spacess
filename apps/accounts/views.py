@@ -2,6 +2,7 @@ import random
 import string
 from datetime import datetime, timedelta
 
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -11,6 +12,7 @@ from rest_framework.generics import (CreateAPIView, GenericAPIView,
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView, Response, status
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import (PasswordResetRequestSerializer,
                           PasswordResetSerializer, UpdateProfileSerializer,
@@ -132,3 +134,54 @@ class GoogleSignInView(APIView):
         redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
 
         return redirect(redirect_url)
+
+
+class GoogleRedirectURIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+
+        if code:
+            token_endpoint = 'https://oauth2.googleapis.com/token'
+            token_params = {
+                'code': code,
+                'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+                'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+                'redirect_uri': "http://localhost:8000/auth/google-redirect/",
+                'grant_type': 'authorization_code',
+            }
+
+            response = requests.post(token_endpoint, data=token_params)
+
+            if response.status_code == 200:
+                access_token = response.json().get('access_token')
+
+                if access_token:
+                    profile_endpoint = 'https://www.googleapis.com/oauth2/v1/userinfo'
+                    headers = {'Authorization': f'Bearer {access_token}'}
+                    profile_response = requests.get(
+                        profile_endpoint,
+                        headers=headers
+                    )
+
+                    if profile_response.status_code == 200:
+                        profile_data = profile_response.json()
+
+                        try:
+                            user = get_user_model().objects.get(
+                                email=profile_data["email"])
+                        except get_user_model().DoesNotExist:
+                            user = get_user_model().objects.create_user(
+                                email=profile_data["email"],
+                                full_name=profile_data["name"]
+                            )
+
+                        data = {'id': user.id, 'email': user.email}
+                        refresh = RefreshToken.for_user(user)
+                        data['access'] = str(refresh.access_token)
+                        data['refresh'] = str(refresh)
+
+                        return Response(data)
+
+        return Response({"message: An error occured"}, status.HTTP_400_BAD_REQUEST)
