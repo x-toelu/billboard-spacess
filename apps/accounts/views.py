@@ -3,6 +3,7 @@ import string
 from datetime import datetime, timedelta
 
 import requests
+from services.google_auth import GoogleAuth
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -142,46 +143,25 @@ class GoogleRedirectURIView(APIView):
     def get(self, request):
         code = request.GET.get('code')
 
-        if code:
-            token_endpoint = 'https://oauth2.googleapis.com/token'
-            token_params = {
-                'code': code,
-                'client_id': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
-                'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
-                'redirect_uri': "http://localhost:8000/auth/google-redirect/",
-                'grant_type': 'authorization_code',
-            }
+        if not code:
+            return Response({"message: An error occured"}, status.HTTP_400_BAD_REQUEST)
 
-            response = requests.post(token_endpoint, data=token_params)
+        google_auth = GoogleAuth()
+        user_info = google_auth.get_user_info(code)
 
-            if response.status_code == 200:
-                access_token = response.json().get('access_token')
+        if user_info:
+            try:
+                user = get_user_model().objects.get(email=user_info["email"])
+            except get_user_model().DoesNotExist:
+                user = get_user_model().objects.create_user(
+                    email=user_info["email"],
+                    full_name=user_info["name"]
+                )
 
-                if access_token:
-                    profile_endpoint = 'https://www.googleapis.com/oauth2/v1/userinfo'
-                    headers = {'Authorization': f'Bearer {access_token}'}
-                    profile_response = requests.get(
-                        profile_endpoint,
-                        headers=headers
-                    )
-
-                    if profile_response.status_code == 200:
-                        profile_data = profile_response.json()
-
-                        try:
-                            user = get_user_model().objects.get(
-                                email=profile_data["email"])
-                        except get_user_model().DoesNotExist:
-                            user = get_user_model().objects.create_user(
-                                email=profile_data["email"],
-                                full_name=profile_data["name"]
-                            )
-
-                        data = {'id': user.id, 'email': user.email}
-                        refresh = RefreshToken.for_user(user)
-                        data['access'] = str(refresh.access_token)
-                        data['refresh'] = str(refresh)
-
-                        return Response(data)
-
-        return Response({"message: An error occured"}, status.HTTP_400_BAD_REQUEST)
+            refresh_token = RefreshToken.for_user(user)
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'access': str(refresh_token.access_token),
+                'refresh': str(refresh_token)
+            })
