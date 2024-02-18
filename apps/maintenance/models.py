@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from utils.constants import NIGERIAN_STATES
+from apps.accounts.choices import State
 
 
 class MaintenanceBooking(models.Model):
@@ -11,7 +11,7 @@ class MaintenanceBooking(models.Model):
         on_delete=models.CASCADE
     )
     location = models.CharField(max_length=255)
-    state = models.CharField(max_length=255, choices=NIGERIAN_STATES)
+    state = models.CharField(max_length=255, choices=State.choices)
     description = models.TextField()
     preferred_date = models.DateField()
     preferred_time = models.TimeField()

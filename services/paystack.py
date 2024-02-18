@@ -1,6 +1,9 @@
 import requests
 from django.conf import settings
 
+from utils.constants import SUBSCRIBERS_FEATURES, SUBUNIT_CURRENCY
+from django.utils import timezone
+
 
 class PayStackSerivce:
     def __init__(self):
@@ -11,11 +14,11 @@ class PayStackSerivce:
         self.currency = "NGN"
         self.session = requests.Session()
 
-    def initialise_payment(self, email, amount):
+    def initialise_payment(self, email: str, amount: str):
         url = "https://api.paystack.co/transaction/initialize"
         payload = {
             "email": email,
-            "amount": amount,
+            "amount": str(amount * SUBUNIT_CURRENCY),
             "currency": self.currency,
         }
 
@@ -34,3 +37,15 @@ class PayStackSerivce:
                 continue
             else:
                 return False
+
+    def create_subscription(self, email: str, plan: str):
+        url = "https://api.paystack.co/subscription"
+        payload = {
+            "customer": email,
+            "plan": SUBSCRIBERS_FEATURES[plan]['plan_code'],
+            "start_date": timezone.localtime().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+        response = self.session.post(url, headers=self.headers, json=payload)
+
+        return response.json()

@@ -48,7 +48,7 @@ def handler_400(request, exception, *args, **kwargs):
 
 
 def handler_404(request, exception):
-    return JsonResponse(data={'message': 'Not found blah', 'errors': None}, status=status.HTTP_404_NOT_FOUND)
+    return JsonResponse(data={'message': 'Not found', 'errors': None}, status=status.HTTP_404_NOT_FOUND)
 
 
 def handler_500(request: HttpRequest) -> JsonResponse:

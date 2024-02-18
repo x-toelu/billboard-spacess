@@ -2,9 +2,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from apps.accounts.mixins import PasswordValidatorMixin
+from .choices import State, UserField
+from .mixins import PasswordValidatorMixin
 
-from utils.constants import NIGERIAN_STATES, USER_CHOICES
 
 class UserCreationSerializer(PasswordValidatorMixin, serializers.ModelSerializer):
     password = serializers.CharField(
@@ -47,7 +47,7 @@ class UserSerializer(MiniUserSerializer):
     class Meta:
         model = get_user_model()
         fields = MiniUserSerializer.Meta.fields + [
-            'phone_number', 'state_of_residence', 'user_field',
+            'phone_number', 'state', 'user_field',
         ]
 
 
@@ -57,11 +57,11 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(required=True)
     user_field = serializers.ChoiceField(
         required=True,
-        choices=USER_CHOICES
+        choices=UserField.choices,
     )
-    state_of_residence = serializers.ChoiceField(
+    state = serializers.ChoiceField(
         required=True,
-        choices=NIGERIAN_STATES
+        choices=State.choices,
     )
 
     class Meta:
@@ -70,7 +70,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'user_field',
             'full_name',
             'phone_number',
-            'state_of_residence',
+            'state',
             'display_name'
         ]
 

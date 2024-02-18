@@ -24,7 +24,7 @@ class BillBoardBookingCreateView(CreateAPIView):
 
         pstack_data = paystack.initialise_payment(
             booking.user.email,
-            str(booking.amount * 100)
+            booking.amount
         )
 
         if pstack_data['status']:

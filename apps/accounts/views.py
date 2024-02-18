@@ -1,24 +1,23 @@
-from datetime import datetime, timedelta
 import random
 import string
+from datetime import datetime, timedelta
 
+import requests
+from services.google_auth import GoogleAuth
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.shortcuts import redirect
+from rest_framework.generics import (CreateAPIView, GenericAPIView,
+                                     RetrieveAPIView)
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView, Response, status
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import Response, status
-
-from .permissions import IsOwnerOrReadOnly
-from .serializers import (
-    PasswordResetRequestSerializer,
-    PasswordResetSerializer,
-    UpdateProfileSerializer,
-    UserCreationSerializer,
-    UserSerializer,
-)
+from .serializers import (PasswordResetRequestSerializer,
+                          PasswordResetSerializer, UpdateProfileSerializer,
+                          UserCreationSerializer, UserSerializer)
 
 
 class UserCreationView(CreateAPIView):
@@ -37,21 +36,16 @@ class UserDetailView(RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UpdateProfileView(UpdateAPIView):
+class UpdateProfileView(UpdateModelMixin, GenericAPIView):
     """
     Updates part of user profile.
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
-    allowed_methods = ['PUT']
+    permission_classes = [AllowAny]
 
-    def patch(self, request, *args, **kwargs):
-        error_data = {
-            "errors": ["Method 'PATCH' not allowed."],
-            "message": "MethodNotAllowed",
-        }
-        return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
 
 class PasswordResetRequestView(CreateAPIView):
@@ -129,3 +123,45 @@ class PasswordResetConfirmView(CreateAPIView):
             return Response({'message': 'Password reset successful.'})
         else:
             return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#  Google Auth
+
+
+class GoogleSignInView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+
+        return redirect(redirect_url)
+
+
+class GoogleRedirectURIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+
+        if not code:
+            return Response({"message: An error occured"}, status.HTTP_400_BAD_REQUEST)
+
+        google_auth = GoogleAuth()
+        user_info = google_auth.get_user_info(code)
+
+        if user_info:
+            try:
+                user = get_user_model().objects.get(email=user_info["email"])
+            except get_user_model().DoesNotExist:
+                user = get_user_model().objects.create_user(
+                    email=user_info["email"],
+                    full_name=user_info["name"]
+                )
+
+            refresh_token = RefreshToken.for_user(user)
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'access': str(refresh_token.access_token),
+                'refresh': str(refresh_token)
+            })
