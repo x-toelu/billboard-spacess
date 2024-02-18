@@ -29,3 +29,14 @@ SUBSCRIBERS_FEATURES = {
         'plan_code': env('PAYSTACK_PRO_PLAN_CODE')
     }
 }
+
+
+EVENTS_STATE_IDS = {
+    "abia": "85675305",
+    "adamawa": "85675451",
+    "akwa-ibom": "85675309",
+    "anambra": "85675375",
+    "bauchi": "421198607",
+    "benue": "85675325",
+    "lagos": "890437281",
+}
