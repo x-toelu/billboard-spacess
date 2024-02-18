@@ -80,7 +80,7 @@ class PasswordResetRequestView(CreateAPIView):
                 fail_silently=False,
             )
 
-        return Response({'detail': 'Password reset email sent.'})
+        return Response({'message': 'Password reset email sent.'})
 
 
 class PasswordResetConfirmView(CreateAPIView):
@@ -107,7 +107,7 @@ class PasswordResetConfirmView(CreateAPIView):
 
             if datetime.now() > expiration_time:
                 return Response(
-                    {'detail': 'OTP has expired. Please request a new one.'},
+                    {'message': 'OTP has expired. Please request a new one.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
