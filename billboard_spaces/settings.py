@@ -188,8 +188,8 @@ SIMPLE_JWT = {
 
 
 # CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST')
 
 # REST Framework settings
 
