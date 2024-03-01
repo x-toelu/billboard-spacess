@@ -1,7 +1,13 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 
 from .models import Billboard
-from .serializers import BillBoardCreationSerializer, BillboardDetailSerializer, BillboardListSerializer
+from .serializers import (
+    BillBoardCreationSerializer,
+    BillboardDetailSerializer,
+    BillboardListSerializer
+)
 
 
 class BillboardListView(ListAPIView):
@@ -18,6 +24,10 @@ class BillboardListView(ListAPIView):
             queryset = queryset.filter(size=size)
 
         return queryset
+
+    @method_decorator(cache_page(60 * 5))
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class BillboardCreateView(CreateAPIView):
@@ -42,6 +52,7 @@ class NewlyAddedBillboardListView(BillboardListView):
 
     def get_queryset(self):
         return super().get_queryset()[:5]
+
 
 
 class BillboardListByCategoryAPIView(BillboardListView):

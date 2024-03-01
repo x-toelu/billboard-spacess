@@ -191,10 +191,24 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 
-# REST Framework settings
+# Cache Settings
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': "redis://default:mMjIWCdj6eiN3Y1NSaIpDkajbB2ykDn6@redis-18620.c281.us-east-1-2.ec2.cloud.redislabs.com:18620",
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        "TIMEOUT": 60 * 5,
+    }
+}
 
+
+
+# REST Framework settings
 REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'
@@ -208,6 +222,7 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.views.custom_exception_handler',
 }
 
+
 # Authentication Backends
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
@@ -215,13 +230,12 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+
 # Google Configuration
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('GOOGLE_CLIENT_ID')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('GOOGLE_CLIENT_SECRET')
 DOMAIN = env('DOMAIN')
 GOOGLE_REDIRECT_URI = f'{DOMAIN}/auth/google-redirect/'
-
-# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
