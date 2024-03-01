@@ -1,8 +1,8 @@
 import requests
 from django.conf import settings
+from django.utils import timezone
 
 from utils.constants import SUBSCRIBERS_FEATURES, SUBUNIT_CURRENCY
-from django.utils import timezone
 
 
 class PayStackSerivce:
