@@ -6,11 +6,100 @@ from apps.events.models import Event
 
 
 class EventBriteService:
+    EVENTBRITE_API_URL = "https://www.eventbrite.com/api/v3/destination/search/"
+    PAGE_SIZE = 100
+
     def __init__(self):
         self.headers = self._get_headers()
         self.session = requests.Session()
 
-    def _get_headers(self):
+    def get_events(self, states_ids: list[int]) -> list[Event]:
+        """
+        Get physical events from Eventbrite.
+        """
+        events = self._fetch_events(states_ids)
+        events = self._filter_events(events)
+
+        return [
+            event
+            for event_info in events
+            if (event := self._create_event(event_info))
+        ]
+
+    def _fetch_events(self, states_ids: list[str]) -> list:
+        """
+        Fetch events from Eventbrite API.
+        """
+        all_events = []
+        page_number, page_count = 1, 1
+
+        # Loop until all events on all pages are fetched
+        while page_number <= page_count:
+            payload = self._create_payload(states_ids, page_number)
+
+            response = self.session.post(
+                url=self.EVENTBRITE_API_URL,
+                headers=self.headers,
+                data=json.dumps(payload)
+            )
+
+            if response.status_code == 200:
+                response_data = response.json()
+                events_data = response_data.get('events', {})
+                events = events_data.get('results', [])
+                all_events.extend(events)
+
+                page_count = events_data['pagination'].get('page_count', 0)
+                page_number += 1
+
+        return all_events
+
+    def _filter_events(self, events: list[dict]) -> list:
+        """
+        Return physical events from the list of events.
+        """
+        physical_events = filter(
+            lambda event: not event.get("is_online_event"),
+            events
+        )
+        return list(physical_events)
+
+    def _create_event(self, event_info: dict) -> Event:
+        """
+        Create an Event object from event info.
+        """
+        event = Event.objects.filter(name=event_info["name"]).first()
+
+        if not event:
+            return Event.objects.create(
+                name=event_info.get("name", ""),
+                description=event_info.get("summary", ""),
+                image=event_info.get("image", {}).get("url", ""),
+                start_date=event_info.get("start_date", ""),
+                end_date=event_info.get("end_date", ""),
+                start_time=event_info.get("start_time", ""),
+                end_time=event_info.get("end_time", ""),
+                location=event_info["primary_venue"]["address"]["localized_address_display"],
+            )
+
+    def _create_payload(self, states_ids: list[str], page_number: int) -> dict:
+        return {
+            "event_search": {
+                "dates": "current_future",
+                "dedup": True,
+                "places": states_ids,
+                "page": page_number,
+                "page_size": self.PAGE_SIZE,
+                "online_events_only": False,
+            },
+            "expand.destination_event": [
+                "primary_venue",
+                "image",
+            ],
+            "browse_surface": "search",
+        }
+
+    def _get_headers(self) -> dict[str]:
         return {
             'authority': 'www.eventbrite.com',
             'accept': '*/*',
@@ -29,77 +118,3 @@ class EventBriteService:
             'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36',
             'x-csrftoken': 'b03410a4570611eea5a41b7c100b7903',
         }
-
-    def get_events(self, states_ids: list):
-        new_events = []
-        events = self.__search_events(states_ids)
-        events = self._filter_events(events)
-
-        for event_info in events:
-            if event := self._create_event(event_info):
-                new_events.append(event)
-
-        return new_events
-
-    def __search_events(self, states_ids: list):
-        all_events = []
-        page_number = 1
-        page_count = 1
-        url = "https://www.eventbrite.com/api/v3/destination/search/"
-
-        # Loop until all events on all pages are fetched
-        while page_number <= page_count:
-            payload = {
-                "event_search": {
-                    "dates": "current_future",
-                    "dedup": True,
-                    "places": states_ids,
-                    "page": page_number,
-                    "page_size": 100,
-                    "online_events_only": False
-                },
-                "expand.destination_event": [
-                    "primary_venue",
-                    "image",
-                ],
-                "browse_surface": "search"
-            }
-
-            response = self.session.post(
-                url=url,
-                headers=self.headers,
-                data=json.dumps(payload)
-            )
-
-            data = response.json()
-            events = data.get('events', {}).get('results', [])
-            all_events.extend(events)
-
-            page_count = data['events']['pagination'].get('page_count', 0)
-            page_number += 1
-
-        return all_events
-
-    def _filter_events(self, events):
-        physical_events = filter(
-            lambda event: not event.get("is_online_event"),
-            events
-        )
-
-        return list(physical_events)
-
-    def _create_event(self, event_info):
-        event = Event.objects.filter(name=event_info["name"]).first()
-
-        if not event:
-            return Event.objects.create(
-                name=event_info.get("name", ""),
-                description=event_info.get("summary", ""),
-                image=event_info.get("image", {}).get("url", ""),
-                start_date=event_info.get("start_date", "2024-01-01"),
-                end_date=event_info.get("end_date", "2024-01-01"),
-                start_time=event_info.get("start_time", "00:01:01"),
-                end_time=event_info.get("end_time", "00:01:01"),
-                location=event_info["primary_venue"]["address"]["localized_address_display"],
-            )
-
