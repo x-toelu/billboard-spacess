@@ -92,7 +92,7 @@ class EventBriteService:
         event = Event.objects.filter(name=event_info["name"]).first()
 
         if not event:
-            event = Event(
+            return Event.objects.create(
                 name=event_info.get("name", ""),
                 description=event_info.get("summary", ""),
                 image=event_info.get("image", {}).get("url", ""),
@@ -102,6 +102,4 @@ class EventBriteService:
                 end_time=event_info.get("end_time", "00:01:01"),
                 location=event_info["primary_venue"]["address"]["localized_address_display"],
             )
-            event.save()
 
-            return event
