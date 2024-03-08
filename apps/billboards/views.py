@@ -48,23 +48,17 @@ class BillboardDetailView(RetrieveAPIView):
 
 
 class NewlyAddedBillboardListView(BillboardListView):
-    pagination_class = None
-
     def get_queryset(self):
         return super().get_queryset()[:5]
 
 
 
 class BillboardListByCategoryAPIView(BillboardListView):
-    pagination_class = None
-
     def get_queryset(self):
         category = self.kwargs.get('category')
         return Billboard.objects.filter(size=category, is_verified=True)
 
 
 class BillboardUserListView(BillboardListView):
-    pagination_class = None
-
     def get_queryset(self):
         return Billboard.objects.filter(is_booked=False, owner=self.request.user)
