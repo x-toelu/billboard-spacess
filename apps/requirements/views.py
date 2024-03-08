@@ -8,7 +8,6 @@ from .serializers import BillboardRequirementSerializer
 
 
 class StateBillBoardReqDetailView(ListAPIView):
-    pagination_class = None
     serializer_class = BillboardRequirementSerializer
 
     def get_queryset(self):
