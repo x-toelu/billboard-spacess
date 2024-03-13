@@ -57,7 +57,6 @@ class UpdateProfileView(UpdateModelMixin, GenericAPIView):
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    permission_classes = [AllowAny]
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
