@@ -27,6 +27,21 @@ class UserCreationView(CreateAPIView):
     serializer_class = UserCreationSerializer
     permission_classes = [AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        user = serializer.instance
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'id': user.id,
+            'email': user.email,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }, status=status.HTTP_201_CREATED)
+
 
 class UserDetailView(RetrieveAPIView):
     """
@@ -42,7 +57,6 @@ class UpdateProfileView(UpdateModelMixin, GenericAPIView):
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    permission_classes = [AllowAny]
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -103,7 +117,8 @@ class PasswordResetConfirmView(CreateAPIView):
         user = get_user_model().objects.filter(email=email).first()
         if user and user.password_reset_otp == otp:
             # Check if OTP is expired
-            expiration_time = user.password_reset_otp_created_at.replace(tzinfo=None) + timedelta(minutes=15)
+            expiration_time = user.password_reset_otp_created_at.replace(
+                tzinfo=None) + timedelta(minutes=15)
 
             if datetime.now() > expiration_time:
                 return Response(
