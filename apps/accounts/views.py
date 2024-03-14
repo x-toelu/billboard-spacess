@@ -116,34 +116,21 @@ class PasswordResetConfirmView(CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         email = serializer.validated_data['email']
         otp = serializer.validated_data['otp']
         password = serializer.validated_data['password']
 
         user = get_user_model().objects.filter(email=email).first()
+
         if user and user.password_reset_otp == otp:
-            # Check if OTP is expired
-            expiration_time = user.password_reset_otp_created_at.replace(
-                tzinfo=None) + timedelta(minutes=15)
+            success, message = reset_password_expire_otp(user, password)
 
-            if datetime.now() > expiration_time:
-                return Response(
-                    {'message': 'OTP has expired. Please request a new one.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            if success:
+                return Response({'message': message})
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-            # reset password
-            user.set_password(password)
-            user.save()
-
-            # mark OTP as expired
-            user.password_reset_otp = None
-            user.password_reset_otp_created_at = None
-            user.save()
-
-            return Response({'message': 'Password reset successful.'})
-        else:
-            return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 #  Google Auth
