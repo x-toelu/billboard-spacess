@@ -1,23 +1,32 @@
 import random
 import string
-from datetime import datetime, timedelta
 
-import requests
-from services.google_auth import GoogleAuth
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.shortcuts import redirect
-from rest_framework.generics import (CreateAPIView, GenericAPIView,
-                                     RetrieveAPIView)
+from django.utils import timezone
+
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    RetrieveAPIView
+)
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView, Response, status
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import (PasswordResetRequestSerializer,
-                          PasswordResetSerializer, UpdateProfileSerializer,
-                          UserCreationSerializer, UserSerializer)
+from helpers.password_reset import reset_password_expire_otp
+from services.google_auth import GoogleAuth
+
+from .serializers import (
+    PasswordResetRequestSerializer,
+    PasswordResetSerializer,
+    UpdateProfileSerializer,
+    UserCreationSerializer,
+    UserSerializer
+)
 
 
 class UserCreationView(CreateAPIView):
@@ -36,8 +45,7 @@ class UserCreationView(CreateAPIView):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            'id': user.id,
-            'email': user.email,
+            **serializer.data,
             'access': str(refresh.access_token),
             'refresh': str(refresh),
         }, status=status.HTTP_201_CREATED)
@@ -78,11 +86,10 @@ class PasswordResetRequestView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
 
-        user = get_user_model().objects.filter(email=email).first()
-        if user:
+        if user := get_user_model().objects.filter(email=email).first():
             otp = ''.join(random.choices(string.digits, k=6))
             user.password_reset_otp = otp
-            user.password_reset_otp_created_at = datetime.now()
+            user.password_reset_otp_created_at = timezone.now()
             user.save()
 
             # Send OTP via email
@@ -110,34 +117,21 @@ class PasswordResetConfirmView(CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         email = serializer.validated_data['email']
         otp = serializer.validated_data['otp']
         password = serializer.validated_data['password']
 
         user = get_user_model().objects.filter(email=email).first()
+
         if user and user.password_reset_otp == otp:
-            # Check if OTP is expired
-            expiration_time = user.password_reset_otp_created_at.replace(
-                tzinfo=None) + timedelta(minutes=15)
+            success, message = reset_password_expire_otp(user, password)
 
-            if datetime.now() > expiration_time:
-                return Response(
-                    {'message': 'OTP has expired. Please request a new one.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            if success:
+                return Response({'message': message})
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
-            # reset password
-            user.set_password(password)
-            user.save()
-
-            # mark OTP as expired
-            user.password_reset_otp = None
-            user.password_reset_otp_created_at = None
-            user.save()
-
-            return Response({'message': 'Password reset successful.'})
-        else:
-            return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 #  Google Auth
