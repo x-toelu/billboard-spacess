@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 def reset_password_expire_otp(user, password):
@@ -8,10 +8,10 @@ def reset_password_expire_otp(user, password):
     This function resets the user's password to the provided one
     and marks the OTP (One Time Password) as expired.
     """
-    expiration_time = user.password_reset_otp_created_at.replace(
-        tzinfo=None) + timedelta(minutes=15)
+    expiration_time = user.password_reset_otp_created_at + \
+        timezone.timedelta(minutes=15)
 
-    if datetime.now() > expiration_time:
+    if timezone.now() > expiration_time:
         return False, 'OTP has expired. Please request a new one.'
 
     # reset password

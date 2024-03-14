@@ -1,11 +1,12 @@
 import random
 import string
-from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.shortcuts import redirect
+from django.utils import timezone
+
 from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
@@ -88,7 +89,7 @@ class PasswordResetRequestView(CreateAPIView):
         if user := get_user_model().objects.filter(email=email).first():
             otp = ''.join(random.choices(string.digits, k=6))
             user.password_reset_otp = otp
-            user.password_reset_otp_created_at = datetime.now()
+            user.password_reset_otp_created_at = timezone.now()
             user.save()
 
             # Send OTP via email
