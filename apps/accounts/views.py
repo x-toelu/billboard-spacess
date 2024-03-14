@@ -2,22 +2,30 @@ import random
 import string
 from datetime import datetime, timedelta
 
-import requests
-from services.google_auth import GoogleAuth
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.shortcuts import redirect
-from rest_framework.generics import (CreateAPIView, GenericAPIView,
-                                     RetrieveAPIView)
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    RetrieveAPIView
+)
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView, Response, status
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import (PasswordResetRequestSerializer,
-                          PasswordResetSerializer, UpdateProfileSerializer,
-                          UserCreationSerializer, UserSerializer)
+from helpers.password_reset import reset_password_expire_otp
+from services.google_auth import GoogleAuth
+
+from .serializers import (
+    PasswordResetRequestSerializer,
+    PasswordResetSerializer,
+    UpdateProfileSerializer,
+    UserCreationSerializer,
+    UserSerializer
+)
 
 
 class UserCreationView(CreateAPIView):
@@ -36,8 +44,7 @@ class UserCreationView(CreateAPIView):
         refresh = RefreshToken.for_user(user)
 
         return Response({
-            'id': user.id,
-            'email': user.email,
+            **serializer.data,
             'access': str(refresh.access_token),
             'refresh': str(refresh),
         }, status=status.HTTP_201_CREATED)
@@ -78,8 +85,7 @@ class PasswordResetRequestView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
 
-        user = get_user_model().objects.filter(email=email).first()
-        if user:
+        if user := get_user_model().objects.filter(email=email).first():
             otp = ''.join(random.choices(string.digits, k=6))
             user.password_reset_otp = otp
             user.password_reset_otp_created_at = datetime.now()
