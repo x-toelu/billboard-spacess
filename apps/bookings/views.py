@@ -20,6 +20,12 @@ class BillBoardBookingCreateView(CreateAPIView):
             **request.data,
         )
 
+        if billboard.is_booked:
+            return Response(
+                {'status': False, 'message': 'Billboard is unavailable at the moment.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         paystack = PayStackSerivce()
 
         pstack_data = paystack.initialise_payment(
