@@ -1,3 +1,4 @@
+import hashlib
 import random
 import string
 
@@ -85,23 +86,27 @@ class PasswordResetRequestView(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
+        user = get_user_model().objects.filter(email=email).first()
 
-        if user := get_user_model().objects.filter(email=email).first():
-            otp = ''.join(random.choices(string.digits, k=6))
-            user.password_reset_otp = otp
-            user.password_reset_otp_created_at = timezone.now()
-            user.save()
-
-            # Send OTP via email
-            send_mail(
-                'Password Reset OTP',
-                f'Your OTP for password reset is: {otp}',
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
-
+        if user:
+            self.create_and_send_otp(user, email)
         return Response({'message': 'Password reset email sent.'})
+
+    def create_and_send_otp(self, user, email):
+        otp = ''.join(random.choices(string.digits, k=6))
+        hashed_otp = hashlib.sha256(otp.encode()).hexdigest()
+        user.password_reset_otp = hashed_otp
+        user.password_reset_otp_created_at = timezone.now()
+        user.save()
+
+        # Send OTP via email
+        send_mail(
+            'Password Reset OTP',
+            f'Your OTP for password reset is: {otp}',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
 
 
 class PasswordResetConfirmView(CreateAPIView):
@@ -123,8 +128,9 @@ class PasswordResetConfirmView(CreateAPIView):
         password = serializer.validated_data['password']
 
         user = get_user_model().objects.filter(email=email).first()
+        hashed_input_otp = hashlib.sha256(otp.encode()).hexdigest()
 
-        if user and user.password_reset_otp == otp:
+        if user and user.password_reset_otp == hashed_input_otp:
             success, message = reset_password_expire_otp(user, password)
 
             if success:
