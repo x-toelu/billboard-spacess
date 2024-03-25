@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 
 class BillBoardCreationSerializer(serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
-    image = serializers.ImageField(required=True)
+    image = serializers.FileField(required=True)
 
     class Meta:
         model = Billboard
@@ -16,6 +16,7 @@ class BillBoardCreationSerializer(serializers.ModelSerializer):
             'image',
             'size',
             'location',
+            'price',
             'state',
             'target_audience',
         ]
