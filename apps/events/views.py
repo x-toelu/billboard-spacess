@@ -10,7 +10,7 @@ from .serializers import EventSerializer
 
 
 class EventListView(ListAPIView):
-    queryset = Event.objects.all()
+    queryset = Event.objects.all()[:10]
     serializer_class = EventSerializer
 
 
