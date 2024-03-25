@@ -9,7 +9,7 @@ from .models import Billboard
 class BillBoardCreationSerializer(SubscriptionValidator, serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
     image = serializers.FileField(required=True)
-    price = serializers.DecimalField(required=True)
+    price = serializers.DecimalField(max_digits=20, decimal_places=2, required=True)
 
     class Meta:
         model = Billboard
