@@ -8,6 +8,7 @@ from .models import Billboard
 
 class BillBoardCreationSerializer(SubscriptionValidator, serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
+    image = serializers.FileField(required=True)
 
     class Meta:
         model = Billboard
@@ -16,6 +17,7 @@ class BillBoardCreationSerializer(SubscriptionValidator, serializers.ModelSerial
             'image',
             'size',
             'location',
+            'price',
             'state',
             'target_audience',
         ]
