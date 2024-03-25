@@ -34,6 +34,12 @@ urlpatterns = [
     path('billboards/', include('apps.billboards.urls')),
     path('notifications/', include('apps.notifications.urls')),
     path('posts/', include('apps.posts.urls')),
+    path('billboard-bookings/', include('apps.bookings.urls')),
+    path('requirements/', include('apps.requirements.urls')),
+    path('maintenance/', include('apps.maintenance.urls')),
+    path('events/', include('apps.events.urls')),
+    path('subscriptions/', include('apps.subscriptions.urls')),
+    path('social-auth/', include('drf_social_oauth2.urls', namespace='drf')),
 
     path('', index_view, name='index-view'),
     path('docs/', docs_schema_view.with_ui('swagger', cache_timeout=0)),

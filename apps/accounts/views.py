@@ -1,23 +1,32 @@
-from datetime import datetime, timedelta
+import hashlib
 import random
 import string
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.shortcuts import redirect
+from django.utils import timezone
 
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import Response, status
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    RetrieveAPIView
+)
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView, Response, status
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from .permissions import IsOwnerOrReadOnly
+from helpers.password_reset import reset_password_expire_otp
+from services.google_auth import GoogleAuth
+
 from .serializers import (
     PasswordResetRequestSerializer,
     PasswordResetSerializer,
     UpdateProfileSerializer,
     UserCreationSerializer,
-    UserSerializer,
+    UserSerializer
 )
 
 
@@ -28,6 +37,20 @@ class UserCreationView(CreateAPIView):
     serializer_class = UserCreationSerializer
     permission_classes = [AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        user = serializer.instance
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            **serializer.data,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }, status=status.HTTP_201_CREATED)
+
 
 class UserDetailView(RetrieveAPIView):
     """
@@ -37,21 +60,15 @@ class UserDetailView(RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UpdateProfileView(UpdateAPIView):
+class UpdateProfileView(UpdateModelMixin, GenericAPIView):
     """
     Updates part of user profile.
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
-    allowed_methods = ['PUT']
 
-    def patch(self, request, *args, **kwargs):
-        error_data = {
-            "errors": ["Method 'PATCH' not allowed."],
-            "message": "MethodNotAllowed",
-        }
-        return Response(error_data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
 
 class PasswordResetRequestView(CreateAPIView):
@@ -69,24 +86,27 @@ class PasswordResetRequestView(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
-
         user = get_user_model().objects.filter(email=email).first()
+
         if user:
-            otp = ''.join(random.choices(string.digits, k=6))
-            user.password_reset_otp = otp
-            user.password_reset_otp_created_at = datetime.now()
-            user.save()
+            self.create_and_send_otp(user, email)
+        return Response({'message': 'Password reset email sent.'})
 
-            # Send OTP via email
-            send_mail(
-                'Password Reset OTP',
-                f'Your OTP for password reset is: {otp}',
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
+    def create_and_send_otp(self, user, email):
+        otp = ''.join(random.choices(string.digits, k=6))
+        hashed_otp = hashlib.sha256(otp.encode()).hexdigest()
+        user.password_reset_otp = hashed_otp
+        user.password_reset_otp_created_at = timezone.now()
+        user.save()
 
-        return Response({'detail': 'Password reset email sent.'})
+        # Send OTP via email
+        send_mail(
+            'Password Reset OTP',
+            f'Your OTP for password reset is: {otp}',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
 
 
 class PasswordResetConfirmView(CreateAPIView):
@@ -102,30 +122,61 @@ class PasswordResetConfirmView(CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         email = serializer.validated_data['email']
         otp = serializer.validated_data['otp']
         password = serializer.validated_data['password']
 
         user = get_user_model().objects.filter(email=email).first()
-        if user and user.password_reset_otp == otp:
-            # Check if OTP is expired
-            expiration_time = user.password_reset_otp_created_at.replace(tzinfo=None) + timedelta(minutes=15)
+        hashed_input_otp = hashlib.sha256(otp.encode()).hexdigest()
 
-            if datetime.now() > expiration_time:
-                return Response(
-                    {'detail': 'OTP has expired. Please request a new one.'},
-                    status=status.HTTP_400_BAD_REQUEST
+        if user and user.password_reset_otp == hashed_input_otp:
+            success, message = reset_password_expire_otp(user, password)
+
+            if success:
+                return Response({'message': message})
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#  Google Auth
+
+
+class GoogleSignInView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        redirect_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile%20https://www.googleapis.com/auth/userinfo.email&access_type=offline&redirect_uri={settings.GOOGLE_REDIRECT_URI}"
+
+        return redirect(redirect_url)
+
+
+class GoogleRedirectURIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+
+        if not code:
+            return Response({"message: An error occured"}, status.HTTP_400_BAD_REQUEST)
+
+        google_auth = GoogleAuth()
+        user_info = google_auth.get_user_info(code)
+
+        if user_info:
+            try:
+                user = get_user_model().objects.get(email=user_info["email"])
+            except get_user_model().DoesNotExist:
+                user = get_user_model().objects.create_user(
+                    email=user_info["email"],
+                    full_name=user_info["name"]
                 )
 
-            # reset password
-            user.set_password(password)
-            user.save()
-
-            # mark OTP as expired
-            user.password_reset_otp = None
-            user.password_reset_otp_created_at = None
-            user.save()
-
-            return Response({'message': 'Password reset successful.'})
-        else:
-            return Response({'message': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
+            refresh_token = RefreshToken.for_user(user)
+            return Response({
+                'id': user.id,
+                'email': user.email,
+                'access': str(refresh_token.access_token),
+                'refresh': str(refresh_token)
+            })

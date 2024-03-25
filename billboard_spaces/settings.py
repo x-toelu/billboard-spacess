@@ -56,6 +56,11 @@ INSTALLED_APPS = [
     "apps.billboards",
     "apps.notifications",
     "apps.posts",
+    "apps.bookings",
+    "apps.requirements",
+    "apps.maintenance",
+    "apps.events",
+    "apps.subscriptions",
 
     # third party apps
     "drf_yasg",
@@ -63,6 +68,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "oauth2_provider",
+    "social_django",
+    "drf_social_oauth2",
 ]
 if DEBUG:
     INSTALLED_APPS.insert(5, 'whitenoise.runserver_nostatic')
@@ -95,6 +103,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -178,24 +188,56 @@ SIMPLE_JWT = {
 
 
 # CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST')
+
+# Cache Settings
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': env("REDIS_URL"),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        "TIMEOUT": 60 * 5,
+    }
+}
+
+
 
 # REST Framework settings
-
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 20,
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 5,
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
     'EXCEPTION_HANDLER': 'utils.views.custom_exception_handler',
 }
 
+
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.google.GoogleOAuth2',
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+# Google Configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('GOOGLE_CLIENT_ID')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('GOOGLE_CLIENT_SECRET')
+DOMAIN = env('DOMAIN')
+GOOGLE_REDIRECT_URI = f'{DOMAIN}/auth/google-redirect/'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
 
 # Cloudinary settings
 
@@ -268,3 +310,9 @@ CSRF_COOKIE_SECURE = not DEBUG
 SECURE_BROWSER_XSS_FILTER = True
 
 X_FRAME_OPTIONS = 'DENY'
+
+
+# Payment Settings
+
+PAYSTACK_API_KEY = env('PAYSTACK_API_KEY')
+PAYSTACK_SECRET_KEY = env('PAYSTACK_SECRET_KEY')

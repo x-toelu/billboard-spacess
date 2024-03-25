@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
-from utils.constants import NIGERIAN_STATES
+from apps.accounts.choices import State
 
 
 class Billboard(models.Model):
@@ -26,7 +26,7 @@ class Billboard(models.Model):
     image = CloudinaryField()
     size = models.CharField(max_length=21, choices=SIZE_CHOICES)
     location = models.CharField(max_length=255)
-    state = models.CharField(max_length=255, choices=NIGERIAN_STATES)
+    state = models.CharField(max_length=255, choices=State.choices)
     target_audience = models.CharField(max_length=255)
 
     price = models.DecimalField(
@@ -35,7 +35,7 @@ class Billboard(models.Model):
         default=Decimal('0.00')
     )
 
-    booked = models.BooleanField(default=False)
+    is_booked = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

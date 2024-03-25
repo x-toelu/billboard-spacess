@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
-from .models import Billboard
 from apps.accounts.serializers import MiniUserSerializer
-from dateutil.relativedelta import relativedelta
+from apps.subscriptions.validators import SubscriptionValidator
+
+from .models import Billboard
 
 
-class BillBoardCreationSerializer(serializers.ModelSerializer):
+class BillBoardCreationSerializer(SubscriptionValidator, serializers.ModelSerializer):
     owner = MiniUserSerializer(read_only=True)
     image = serializers.FileField(required=True)
 
@@ -20,6 +21,11 @@ class BillBoardCreationSerializer(serializers.ModelSerializer):
             'state',
             'target_audience',
         ]
+
+    def validate(self, data):
+        user = self.context['request'].user
+        self.validate_create_billboards(user)
+        return data
 
 
 class BillboardListSerializer(serializers.ModelSerializer):
@@ -48,7 +54,7 @@ class BillboardDetailSerializer(BillboardListSerializer):
     class Meta:
         model = Billboard
         fields = BillboardListSerializer.Meta.fields + [
-            'booked',
+            'is_booked',
             'target_audience',
             'created_at',
         ]
