@@ -32,7 +32,15 @@ class Booking(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __get_price(self):
+    def mark_as_paid(self):
+        self.is_paid = True
+        self.save()
+
+        # Update the booked status of the associated billboard
+        self.billboard.is_booked = True
+        self.billboard.save()
+
+    def _get_price(self):
         period_multiplier = {
             'weekly': 1 / WEEKS_IN_MONTH,
             'monthly': 1,
@@ -46,7 +54,7 @@ class Booking(models.Model):
 
     @property
     def amount(self):
-        return self.timeline * self.__get_price()
+        return self.timeline * self._get_price()
 
     def __str__(self) -> str:
         return f"₦{self.amount} {self.period}({self.timeline}) booking for billboard @ {self.billboard.full_location}"

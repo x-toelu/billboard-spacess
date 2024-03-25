@@ -55,12 +55,7 @@ class VerifyPaymentView(APIView):
 
         paystack = PayStackSerivce()
         if paystack.verify_payment(booking.paystack_ref):
-            booking.is_paid = True
-            booking.save()
-
-            # Update the booked status of the associated billboard
-            booking.billboard.is_booked = True
-            booking.billboard.save()
+            booking.mark_as_paid()
 
             return Response({'message': 'Payment successful'})
 
