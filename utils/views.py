@@ -5,8 +5,8 @@ from django.http import HttpRequest, JsonResponse
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.views import get_schema_view
-from rest_framework import serializers, status
 
+from rest_framework import serializers, status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny
