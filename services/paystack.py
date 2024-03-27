@@ -61,12 +61,19 @@ class PayStackSerivce:
 
     def create_subscription(self, email: str, plan: str):
         url = "https://api.paystack.co/subscription"
+        plan_code = SUBSCRIBERS_FEATURES[plan]['plan_code']
+
         payload = {
             "customer": email,
-            "plan": SUBSCRIBERS_FEATURES[plan]['plan_code'],
-            "start_date": timezone.localtime().strftime("%Y-%m-%d %H:%M:%S"),
+            "plan": plan_code,
         }
 
         response = self.session.post(url, headers=self.headers, json=payload)
+        response_data = response.json()
+
+        # If user not existing customer or has no active authorizations, initiate payment
+        if response_data.get("code") in ["customer_not_found", "no_active_authorizations_for_customer"]:
+            # value for amount is irrelevant, as plan amount will overide the passed amont
+            return self.initialise_payment(email, 10, plan=plan_code)
 
         return response.json()
