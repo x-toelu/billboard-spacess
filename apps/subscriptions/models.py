@@ -21,6 +21,7 @@ class Subscription(models.Model):
     expires_at = models.DateTimeField(null=True)
 
     # paystack subscription requirements
+    paystack_ref = models.CharField(max_length=100, null=True)
     paystack_sub_code = models.CharField(max_length=100, null=True)
     paystack_email_token = models.CharField(max_length=100, null=True)
 
