@@ -14,16 +14,16 @@ class PayStackSerivce:
         self.currency = "NGN"
         self.session = requests.Session()
 
-    def initialise_payment(self, email: str, amount: str):
+    def initialise_payment(self, email: str, amount: int, **kwargs):
         url = "https://api.paystack.co/transaction/initialize"
         payload = {
             "email": email,
             "amount": str(amount * SUBUNIT_CURRENCY),
             "currency": self.currency,
+            **kwargs,
         }
 
         response = self.session.post(url, headers=self.headers, json=payload)
-
         return response.json()
 
     def verify_payment(self, paystack_ref):
