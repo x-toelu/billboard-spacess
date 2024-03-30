@@ -3,7 +3,6 @@ import time
 
 import requests
 from django.conf import settings
-from django.utils import timezone
 
 from utils.constants import SUBSCRIBERS_FEATURES, SUBUNIT_CURRENCY
 
@@ -71,9 +70,26 @@ class PayStackSerivce:
         response = self.session.post(url, headers=self.headers, json=payload)
         response_data = response.json()
 
-        # If user not existing customer or has no active authorizations, initiate payment
+        # If user not existing customer or has no active authorizations, initialise payment
+        # value for amount is irrelevant, as plan amount will overide the passed amont
         if response_data.get("code") in ["customer_not_found", "no_active_authorizations_for_customer"]:
-            # value for amount is irrelevant, as plan amount will overide the passed amont
-            return self.initialise_payment(email, 10, plan=plan_code)
+            payment_data = self.initialise_payment(email, 10, plan=plan_code)
+            return {'condition': 'verify', **payment_data}
+        elif response_data.get("code") == "duplicate_subscription":
+            return {'condition': 'paid',  **response.json()}
 
-        return response.json()
+        return {'condition': 'paid', **response.json()}
+
+    def get_subscription_code(self, email, plan):
+        plan_code = SUBSCRIBERS_FEATURES[plan]['plan_code']
+        url = f"https://api.paystack.co/plan/{plan_code}"
+
+        response = self.session.get(url, headers=self.headers)
+        response_data = response.json().get("data", {})
+        subscriptions = response_data.get("subscriptions", [])
+
+        for subscription in subscriptions:
+            if subscription.get("customer", {}).get("email") == email:
+                return subscription.get("subscription_code"), subscription.get("email_token")
+
+        return None
