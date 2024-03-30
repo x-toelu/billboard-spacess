@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import Response, status
 
@@ -52,3 +53,32 @@ class SubscriptionView(GenericAPIView):
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
+
+
+class VerifySubscriptionView(GenericAPIView):
+    def get(self, request, *args, **kwargs):  # sourcery skip: extract-method
+        sub_id = kwargs.get('sub_id')
+        subscription = get_object_or_404(Subscription, pk=sub_id)
+
+        paystack = PayStackSerivce()
+        if paystack.verify_payment(subscription.paystack_ref):
+            paystack_codes = paystack.get_subscription_code(
+                subscription.user.email,
+                subscription.plan
+            )
+
+            if not paystack_codes:
+                return Response(
+                    {'message': 'Payment failed, try again'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            pstack_sub_code, pstack_email_token = paystack_codes
+            subscription.paystack_sub_code = pstack_sub_code
+            subscription.paystack_email_token = pstack_email_token
+            subscription.is_active = True
+            subscription.save()
+
+            return Response({'message': 'Payment successful'})
+
+        return Response({'message': 'Payment failed, try again'}, status=status.HTTP_400_BAD_REQUEST)
