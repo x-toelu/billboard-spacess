@@ -25,7 +25,7 @@ class Subscription(models.Model):
     paystack_sub_code = models.CharField(max_length=100, null=True)
     paystack_email_token = models.CharField(max_length=100, null=True)
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     @property
     def has_expired(self):
