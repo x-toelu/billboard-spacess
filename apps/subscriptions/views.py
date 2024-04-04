@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import GenericAPIView
-from rest_framework.views import Response, status
+from rest_framework.views import APIView, Response, status
 
 from services.paystack import (
     PayStackSerivce,
@@ -47,7 +47,7 @@ class SubscriptionView(GenericAPIView):
         return serializer.save(user=self.request.user)
 
 
-class VerifySubscriptionView(GenericAPIView):
+class VerifySubscriptionView(APIView):
     def get(self, request, *args, **kwargs):
         sub_id = kwargs.get('sub_id')
         subscription = get_object_or_404(Subscription, pk=sub_id)
