@@ -3,6 +3,7 @@ import json
 import requests
 
 from apps.events.models import Event
+from utils.constants import EVENTS_STATE_IDS
 
 
 class EventBriteService:
@@ -13,11 +14,11 @@ class EventBriteService:
         self.headers = self._get_headers()
         self.session = requests.Session()
 
-    def get_events(self, states_ids: list[int]) -> list[Event]:
+    def get_events(self) -> list[Event]:
         """
         Get physical events from Eventbrite.
         """
-        events = self._fetch_events(states_ids)
+        events = self._fetch_events(list(EVENTS_STATE_IDS.values()))
         events = self._filter_events(events)
 
         return [
@@ -26,31 +27,32 @@ class EventBriteService:
             if (event := self._create_event(event_info))
         ]
 
-    def _fetch_events(self, states_ids: list[str]) -> list:
+    def _fetch_events(self, states_ids) -> list:
         """
         Fetch events from Eventbrite API.
         """
         all_events = []
-        page_number, page_count = 1, 1
 
         # Loop until all events on all pages are fetched
-        while page_number <= page_count:
-            payload = self._create_payload(states_ids, page_number)
+        for state_id in states_ids:
+            page_number, page_count = 1, 1
+            while page_number <= page_count:
+                payload = self._create_payload([state_id], page_number)
 
-            response = self.session.post(
-                url=self.EVENTBRITE_API_URL,
-                headers=self.headers,
-                data=json.dumps(payload)
-            )
+                response = self.session.post(
+                    url=self.EVENTBRITE_API_URL,
+                    headers=self.headers,
+                    data=json.dumps(payload)
+                )
 
-            if response.status_code == 200:
-                response_data = response.json()
-                events_data = response_data.get('events', {})
-                events = events_data.get('results', [])
-                all_events.extend(events)
+                if response.status_code == 200:
+                    response_data = response.json()
+                    events_data = response_data.get('events', {})
+                    events = events_data.get('results', [])
+                    all_events.extend(events)
 
-                page_count = events_data['pagination'].get('page_count', 0)
-                page_number += 1
+                    page_count = events_data['pagination'].get('page_count', 0)
+                    page_number += 1
 
         return all_events
 

@@ -77,6 +77,7 @@ class PayStackSerivce:
         if response_data.get("code") in ["customer_not_found", "no_active_authorizations_for_customer"]:
             payment_data = self.initialise_payment(email, 10, plan=plan_code)
             return {'condition': 'verify', **payment_data}
+
         elif response_data.get("code") == "duplicate_subscription":
             return {'condition': 'paid',  **response.json()}
 
