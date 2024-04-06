@@ -17,8 +17,9 @@ def send_maintenance_email(sender, instance, created, **kwargs):
         admins_emails = admins.values_list('email', flat=True)
 
         message = f"""
-        {instance.user.display_name} would like a maintenace on
-        {instance.preferred_date} at {instance.preferred_time} beacause; {instance.description}
+        {instance.user.display_name} would like a maintenace on {instance.preferred_date}
+        {instance.preferred_time} at {instance.location}.
+        Reason: {instance.description}
         """
         send_mail(
             subject=f'{instance.user.display_name} booked for maintenance',
