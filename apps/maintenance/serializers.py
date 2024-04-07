@@ -15,7 +15,6 @@ class MaintenanceBookingSerializer(serializers.ModelSerializer):
             'email',
             'phone_number',
             'location',
-            'state',
             'description',
             'preferred_date',
             'preferred_time',

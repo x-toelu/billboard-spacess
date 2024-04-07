@@ -10,7 +10,7 @@ from .serializers import EventSerializer
 
 
 class EventListView(ListAPIView):
-    queryset = Event.objects.all()
+    queryset = Event.objects.all()[:10]
     serializer_class = EventSerializer
 
 
@@ -21,7 +21,7 @@ class GetNewEventsView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         eventbrite = EventBriteService()
-        queryset = eventbrite.get_events(list(EVENTS_STATE_IDS.values()))
+        queryset = eventbrite.get_events()
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)

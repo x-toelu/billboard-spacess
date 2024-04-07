@@ -18,13 +18,14 @@ class Subscription(models.Model):
         choices=SubscriptionType.choices,
         default=SubscriptionType.FREE
     )
-    expires_at = models.DateTimeField(null=True)
 
     # paystack subscription requirements
+    paystack_ref = models.CharField(max_length=100, null=True)
     paystack_sub_code = models.CharField(max_length=100, null=True)
     paystack_email_token = models.CharField(max_length=100, null=True)
 
-    is_active = models.BooleanField(default=True)
+    expires_at = models.DateTimeField(null=True)
+    is_active = models.BooleanField(default=False)
 
     @property
     def has_expired(self):

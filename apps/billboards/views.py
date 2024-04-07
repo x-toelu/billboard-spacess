@@ -17,6 +17,10 @@ class BillboardListView(ListAPIView):
         queryset = Billboard.objects.filter(is_booked=False, is_verified=True)
         state = self.request.query_params.get('state')
         size = self.request.query_params.get('size')
+        search_keyword = self.request.query_params.get('search_keyword')
+
+        if search_keyword:
+            queryset = queryset.filter(location__icontains=search_keyword)
 
         if state:
             queryset = queryset.filter(state=state)
@@ -50,7 +54,6 @@ class BillboardDetailView(RetrieveAPIView):
 class NewlyAddedBillboardListView(BillboardListView):
     def get_queryset(self):
         return super().get_queryset()[:5]
-
 
 
 class BillboardListByCategoryAPIView(BillboardListView):

@@ -34,9 +34,9 @@ SUBSCRIBERS_FEATURES = {
 EVENTS_STATE_IDS = {
     "lagos": "890437281",
     "abia": "85675305",
-    # "adamawa": "85675451",
-    # "akwa-ibom": "85675309",
-    # "anambra": "85675375",
-    # "bauchi": "421198607",
-    # "benue": "85675325",
+    "adamawa": "85675451",
+    "akwa-ibom": "85675309",
+    "anambra": "85675375",
+    "bauchi": "421198607",
+    "benue": "85675325",
 }
