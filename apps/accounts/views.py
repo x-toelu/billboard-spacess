@@ -65,7 +65,6 @@ class UpdateProfileView(UpdateAPIView):
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
-    http_method_names = ['put']
 
     def get_object(self):
         user = self.request.user
