@@ -5,15 +5,14 @@ import string
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 
 from rest_framework.generics import (
     CreateAPIView,
-    GenericAPIView,
-    RetrieveAPIView
+    RetrieveAPIView,
+    UpdateAPIView
 )
-from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView, Response, status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -60,15 +59,19 @@ class UserDetailView(RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UpdateProfileView(UpdateModelMixin, GenericAPIView):
+class UpdateProfileView(UpdateAPIView):
     """
-    Updates part of user profile.
+    Updates user profile.
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    def get_object(self):
+        user = self.request.user
+        queryset = self.filter_queryset(self.get_queryset())
+        object = get_object_or_404(queryset, email=user.email)
+
+        return object
 
 
 class PasswordResetRequestView(CreateAPIView):

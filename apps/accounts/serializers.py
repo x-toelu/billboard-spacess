@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 
 from .choices import State, UserField
 from .mixins import PasswordValidatorMixin
@@ -55,10 +57,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(required=True)
     phone_number = serializers.CharField(required=True)
     display_name = serializers.CharField(required=True)
-    user_field = serializers.ChoiceField(
-        required=True,
-        choices=UserField.choices,
-    )
+    user_field = serializers.CharField(required=True)
     state = serializers.ChoiceField(
         required=True,
         choices=State.choices,
@@ -73,6 +72,28 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             'state',
             'display_name'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.valid_user_field_choices = set(choice for tuples in UserField.choices for choice in tuples)
+
+    def validate_user_field(self, obj):
+        """
+        This function manually validates a user field instead of relying on the 
+        default `ChoiceField` with the `choices` argument.
+
+        The reason behind this is to address challenges encountered by the 
+        frontend dev sending data as required. Because, sometimes we all
+        encounter little skill issues & tackling them as a team is part of the fun.
+        """
+
+        user_field = obj.lower().split(' ')
+        user_field = "-".join(user_field)
+
+        if user_field not in self.valid_user_field_choices:
+            raise ValidationError(f'"{obj}" is not a valid choice.')
+
+        return user_field
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
