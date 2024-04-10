@@ -61,10 +61,11 @@ class UserDetailView(RetrieveAPIView):
 
 class UpdateProfileView(UpdateAPIView):
     """
-    Updates part of user profile.
+    Updates user profile.
     """
     serializer_class = UpdateProfileSerializer
     queryset = get_user_model().objects.all()
+    http_method_names = ['put']
 
     def get_object(self):
         user = self.request.user
